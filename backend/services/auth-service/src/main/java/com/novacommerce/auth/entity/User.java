@@ -2,8 +2,12 @@ package com.novacommerce.auth.entity;
 
 import com.novacommerce.auth.enums.Role;
 
+import java.time.LocalDate;
 import java.util.*;
 
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -37,6 +41,13 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
+    @CreationTimestamp
+    @Column(updatable = false)
+    private Date created_at;
+
+    @UpdateTimestamp
+    private Date updated_at;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

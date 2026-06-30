@@ -2,7 +2,7 @@ package com.novacommerce.auth;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -10,10 +10,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -176,7 +177,7 @@ class AuthServiceApplicationTests {
 	@Test
 	void adminManagedUserCreationCanCreateAdmin() throws Exception {
 		mockMvc.perform(post("/api/auth/admin/users")
-						.with(jwt().authorities(() -> "ROLE_ADMIN"))
+						.with(adminUser())
 						.contentType(MediaType.APPLICATION_JSON)
 						.content("""
 								{
@@ -208,27 +209,27 @@ class AuthServiceApplicationTests {
 	@Test
 	void roleProbeEndpointsAllowAndDenyExpectedRoles() throws Exception {
 		mockMvc.perform(get("/api/admin/ping")
-						.with(jwt().authorities(() -> "ROLE_ADMIN")))
+						.with(userWithRole("ROLE_ADMIN")))
 				.andExpect(status().isOk());
 
 		mockMvc.perform(get("/api/admin/ping")
-						.with(jwt().authorities(() -> "ROLE_MERCHANT")))
+						.with(userWithRole("ROLE_MERCHANT")))
 				.andExpect(status().isForbidden());
 
 		mockMvc.perform(get("/api/merchant/ping")
-						.with(jwt().authorities(() -> "ROLE_MERCHANT")))
+						.with(userWithRole("ROLE_MERCHANT")))
 				.andExpect(status().isOk());
 
 		mockMvc.perform(get("/api/merchant/ping")
-						.with(jwt().authorities(() -> "ROLE_ADMIN")))
+						.with(userWithRole("ROLE_ADMIN")))
 				.andExpect(status().isOk());
 
 		mockMvc.perform(get("/api/customer/ping")
-						.with(jwt().authorities(() -> "ROLE_CUSTOMER")))
+						.with(userWithRole("ROLE_CUSTOMER")))
 				.andExpect(status().isOk());
 
 		mockMvc.perform(get("/api/customer/ping")
-						.with(jwt().authorities(() -> "ROLE_MERCHANT")))
+						.with(userWithRole("ROLE_MERCHANT")))
 				.andExpect(status().isForbidden());
 	}
 
@@ -247,6 +248,14 @@ class AuthServiceApplicationTests {
 				.fullName(fullName)
 				.role(role)
 				.build());
+	}
+
+	private static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor adminUser() {
+		return userWithRole("ROLE_ADMIN");
+	}
+
+	private static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor userWithRole(String role) {
+		return user("test@example.com").authorities(new SimpleGrantedAuthority(role));
 	}
 
 	private String loginToken(String email, String password) throws Exception {

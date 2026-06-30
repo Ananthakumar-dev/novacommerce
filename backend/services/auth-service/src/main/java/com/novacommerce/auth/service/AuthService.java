@@ -3,12 +3,15 @@ package com.novacommerce.auth.service;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.novacommerce.auth.dto.AuthRequest;
 import com.novacommerce.auth.dto.AuthResponse;
 import com.novacommerce.auth.dto.RegisterRequest;
+import com.novacommerce.auth.dto.UpdateUserRequest;
 import com.novacommerce.auth.dto.UserProfileResponse;
 import com.novacommerce.auth.entity.User;
 import com.novacommerce.auth.enums.Role;
@@ -51,6 +54,50 @@ public class AuthService {
         return createUser(request);
     }
 
+    public java.util.List<UserProfileResponse> listUsers() {
+        return userRepository.findAll()
+                .stream()
+                .map(this::toProfileResponse)
+                .toList();
+    }
+
+    public UserProfileResponse getUser(Long id) {
+        return userRepository.findById(id)
+                .map(this::toProfileResponse)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User was not found"));
+    }
+
+    @Transactional
+    public UserProfileResponse updateUser(Long id, UpdateUserRequest request) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User was not found"));
+
+        userRepository.findByEmail(request.getEmail())
+                .filter(existing -> !existing.getId().equals(id))
+                .ifPresent(existing -> {
+                    throw new DuplicateEmailException("A user with this email already exists");
+                });
+
+        user.setEmail(request.getEmail());
+        user.setFullName(request.getFullName());
+        user.setRole(request.getRole());
+
+        if (request.getPassword() != null && !request.getPassword().isBlank()) {
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+        }
+
+        return toProfileResponse(userRepository.save(user));
+    }
+
+    @Transactional
+    public void deleteUser(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User was not found");
+        }
+
+        userRepository.deleteById(id);
+    }
+
     @Transactional
     public AuthResponse bootstrapAdmin(RegisterRequest request) {
         if (userRepository.existsByRole(Role.ADMIN)) {
@@ -61,7 +108,7 @@ public class AuthService {
     }
 
     public UserProfileResponse profile(User user) {
-        return new UserProfileResponse(user.getId(), user.getEmail(), user.getFullName(), user.getRole());
+        return toProfileResponse(user);
     }
 
     private AuthResponse createUser(RegisterRequest request) {
@@ -82,5 +129,9 @@ public class AuthService {
     private AuthResponse toAuthResponse(User user) {
         String token = jwtUtil.generateToken(user, user.getRole().name());
         return new AuthResponse(token, user.getRole().name(), user.getEmail(), user.getFullName());
+    }
+
+    private UserProfileResponse toProfileResponse(User user) {
+        return new UserProfileResponse(user.getId(), user.getEmail(), user.getFullName(), user.getRole());
     }
 }

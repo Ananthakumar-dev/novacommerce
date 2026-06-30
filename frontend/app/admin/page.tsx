@@ -1,17 +1,8 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import {
-  ArrowRight,
-  BadgeCheck,
-  LockKeyhole,
-  Mail,
-  ShieldCheck,
-  Store,
-} from "lucide-react"
+import { BadgeCheck, LockKeyhole, ShieldCheck, Store } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { AdminLoginForm } from "@/app/admin/login-form"
 
 export const metadata: Metadata = {
   title: "Admin Login | NovaCommerce",
@@ -102,58 +93,7 @@ export default function AdminLoginPage() {
                 </div>
               </div>
 
-              <form className="space-y-5">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email address</Label>
-                  <div className="relative">
-                    <Mail
-                      className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
-                      aria-hidden="true"
-                    />
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      autoComplete="email"
-                      placeholder="admin@novacommerce.com"
-                      className="pl-9"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between gap-4">
-                    <Label htmlFor="password">Password</Label>
-                    <Link
-                      href="#"
-                      className="text-sm font-medium text-foreground underline-offset-4 hover:underline"
-                    >
-                      Forgot password?
-                    </Link>
-                  </div>
-                  <div className="relative">
-                    <LockKeyhole
-                      className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
-                      aria-hidden="true"
-                    />
-                    <Input
-                      id="password"
-                      name="password"
-                      type="password"
-                      autoComplete="current-password"
-                      placeholder="Enter your password"
-                      className="pl-9"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <Button type="submit" className="h-10 w-full">
-                  Sign in
-                  <ArrowRight data-icon="inline-end" aria-hidden="true" />
-                </Button>
-              </form>
+              <AdminLoginForm />
 
               <div className="mt-6 flex items-start gap-3 rounded-lg border bg-muted/40 p-3 text-sm text-muted-foreground">
                 <BadgeCheck
@@ -162,7 +102,7 @@ export default function AdminLoginPage() {
                 />
                 <p>
                   This area is for authorized NovaCommerce staff only. Backend
-                  authentication will be connected in a later phase.
+                  authentication is handled securely on the server.
                 </p>
               </div>
             </div>
