@@ -3,6 +3,9 @@ package com.novacommerce.auth.service;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,7 +57,7 @@ public class AuthService {
         return createUser(request);
     }
 
-    public java.util.List<UserProfileResponse> listUsers() {
+    public List<UserProfileResponse> listUsers() {
         return userRepository.findAll()
                 .stream()
                 .map(this::toProfileResponse)
