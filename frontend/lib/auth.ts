@@ -19,7 +19,11 @@ export type AdminProfile = {
 }
 
 export function getAuthServiceUrl() {
-  return process.env.AUTH_SERVICE_URL ?? "http://localhost:8081"
+  return getApiGatewayUrl()
+}
+
+export function getApiGatewayUrl() {
+  return process.env.API_GATEWAY_URL ?? "http://localhost:8080"
 }
 
 export async function setAdminTokenCookie(token: string) {

@@ -1,7 +1,7 @@
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 
-import { getAdminToken, getAuthServiceUrl } from "@/lib/auth"
+import { getAdminToken, getApiGatewayUrl } from "@/lib/auth"
 
 export type AdminUserRole = "ADMIN" | "CUSTOMER" | "MERCHANT"
 
@@ -18,7 +18,7 @@ export type UserFormState = {
 
 export async function listAdminUsers() {
   const token = await requireAdminToken()
-  const response = await fetch(`${getAuthServiceUrl()}/api/auth/admin/users`, {
+  const response = await fetch(`${getApiGatewayUrl()}/api/auth/admin/users`, {
     headers: authHeaders(token),
     cache: "no-store",
   })
@@ -33,7 +33,7 @@ export async function listAdminUsers() {
 export async function getAdminUser(id: string) {
   const token = await requireAdminToken()
   const response = await fetch(
-    `${getAuthServiceUrl()}/api/auth/admin/users/${id}`,
+    `${getApiGatewayUrl()}/api/auth/admin/users/${id}`,
     {
       headers: authHeaders(token),
       cache: "no-store",
@@ -49,7 +49,7 @@ export async function getAdminUser(id: string) {
 
 export async function createAdminUser(formData: FormData) {
   const token = await requireAdminToken()
-  const response = await fetch(`${getAuthServiceUrl()}/api/auth/admin/users`, {
+  const response = await fetch(`${getApiGatewayUrl()}/api/auth/admin/users`, {
     method: "POST",
     headers: authHeaders(token),
     body: JSON.stringify(userPayload(formData, true)),
@@ -70,7 +70,7 @@ export async function createAdminUser(formData: FormData) {
 export async function updateAdminUser(id: string, formData: FormData) {
   const token = await requireAdminToken()
   const response = await fetch(
-    `${getAuthServiceUrl()}/api/auth/admin/users/${id}`,
+    `${getApiGatewayUrl()}/api/auth/admin/users/${id}`,
     {
       method: "PUT",
       headers: authHeaders(token),
@@ -92,7 +92,7 @@ export async function updateAdminUser(id: string, formData: FormData) {
 
 export async function deleteAdminUser(id: string) {
   const token = await requireAdminToken()
-  await fetch(`${getAuthServiceUrl()}/api/auth/admin/users/${id}`, {
+  await fetch(`${getApiGatewayUrl()}/api/auth/admin/users/${id}`, {
     method: "DELETE",
     headers: authHeaders(token),
     cache: "no-store",

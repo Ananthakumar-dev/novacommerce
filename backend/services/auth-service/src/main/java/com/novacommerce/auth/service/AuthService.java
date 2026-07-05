@@ -126,6 +126,7 @@ public class AuthService {
                 .role(request.getRole())
                 .build();
 
+        System.out.println(user);
         return toAuthResponse(userRepository.save(user));
     }
 

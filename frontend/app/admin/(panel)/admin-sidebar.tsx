@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Store, Users } from "lucide-react"
+import { LayoutDashboard, Package, Store, Users } from "lucide-react"
 
 import type { AdminProfile } from "@/lib/auth"
 import {
@@ -29,6 +29,11 @@ const navItems = [
     title: "Users",
     href: "/admin/users",
     icon: Users,
+  },
+  {
+    title: "Products",
+    href: "/admin/products",
+    icon: Package,
   },
 ]
 
