@@ -44,6 +44,7 @@ const initialState: ProductFormState = {}
 export function ProductForm({ action, options, product }: ProductFormProps) {
   const [state, formAction] = useActionState(action, initialState)
   const isEditing = Boolean(product)
+  const hasCategories = options.categories.length > 0
 
   return (
     <Card className="max-w-4xl">
@@ -67,6 +68,19 @@ export function ProductForm({ action, options, product }: ProductFormProps) {
                 aria-hidden="true"
               />
               <span>{state.error}</span>
+            </div>
+          ) : null}
+
+          {!hasCategories ? (
+            <div
+              role="alert"
+              className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive"
+            >
+              <AlertCircle
+                className="mt-0.5 size-4 shrink-0"
+                aria-hidden="true"
+              />
+              <span>Add an active category before creating products.</span>
             </div>
           ) : null}
 
@@ -101,7 +115,11 @@ export function ProductForm({ action, options, product }: ProductFormProps) {
               />
             </Field>
             <Field label="Category" htmlFor="category">
-              <Select name="category" defaultValue={product?.category ?? options.categories[0]}>
+              <Select
+                name="category"
+                defaultValue={product?.category ?? options.categories[0]}
+                disabled={!hasCategories}
+              >
                 <SelectTrigger id="category" className="w-full">
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
@@ -257,7 +275,7 @@ export function ProductForm({ action, options, product }: ProductFormProps) {
               Back
             </Link>
           </Button>
-          <SubmitButton isEditing={isEditing} />
+          <SubmitButton isEditing={isEditing} disabled={!hasCategories} />
         </CardFooter>
       </form>
     </Card>
@@ -296,11 +314,17 @@ function Textarea({
   )
 }
 
-function SubmitButton({ isEditing }: { isEditing: boolean }) {
+function SubmitButton({
+  isEditing,
+  disabled,
+}: {
+  isEditing: boolean
+  disabled: boolean
+}) {
   const { pending } = useFormStatus()
 
   return (
-    <Button type="submit" disabled={pending}>
+    <Button type="submit" disabled={pending || disabled}>
       <Save data-icon="inline-start" aria-hidden="true" />
       {pending ? "Saving..." : isEditing ? "Save changes" : "Add product"}
     </Button>

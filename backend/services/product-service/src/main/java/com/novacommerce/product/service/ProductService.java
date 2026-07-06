@@ -16,6 +16,7 @@ import com.novacommerce.product.enums.ProductStatus;
 import com.novacommerce.product.exception.DuplicateProductException;
 import com.novacommerce.product.exception.InvalidProductOptionException;
 import com.novacommerce.product.exception.ProductNotFoundException;
+import com.novacommerce.product.repository.CategoryRepository;
 import com.novacommerce.product.repository.ProductRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class ProductService {
     private static final Pattern NON_SLUG_CHARS = Pattern.compile("[^a-z0-9]+");
 
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
 
     public List<ProductResponse> listProducts() {
         return productRepository.findAll()
@@ -118,7 +120,12 @@ public class ProductService {
                 .map(ProductStatus::name)
                 .toList();
 
-        return new ProductOptionsResponse(ProductOptions.CATEGORIES, ProductOptions.BRANDS, statuses);
+        var categories = categoryRepository.findByActiveTrueOrderByNameAsc()
+                .stream()
+                .map(category -> category.getName())
+                .toList();
+
+        return new ProductOptionsResponse(categories, ProductOptions.BRANDS, statuses);
     }
 
     private Product findProduct(Long id) {
@@ -127,7 +134,7 @@ public class ProductService {
     }
 
     private void validateOptions(ProductRequest request) {
-        if (!ProductOptions.CATEGORIES.contains(normalizeRequired(request.getCategory()))) {
+        if (!categoryRepository.existsByNameIgnoreCaseAndActiveTrue(normalizeRequired(request.getCategory()))) {
             throw new InvalidProductOptionException("Invalid category selected");
         }
 

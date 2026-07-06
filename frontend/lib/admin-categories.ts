@@ -1,0 +1,156 @@
+import { revalidatePath } from "next/cache"
+import { redirect } from "next/navigation"
+
+import { getAdminToken, getApiGatewayUrl } from "@/lib/auth"
+
+export type AdminCategory = {
+  id: number
+  name: string
+  slug: string
+  description: string | null
+  active: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export type CategoryFormState = {
+  error?: string
+}
+
+export async function listAdminCategories() {
+  const token = await requireAdminToken()
+  const response = await fetch(`${getApiGatewayUrl()}/api/admin/categories`, {
+    headers: authHeaders(token),
+    cache: "no-store",
+  })
+
+  if (!response.ok) {
+    return []
+  }
+
+  return (await response.json()) as AdminCategory[]
+}
+
+export async function getAdminCategory(id: string) {
+  const token = await requireAdminToken()
+  const response = await fetch(`${getApiGatewayUrl()}/api/admin/categories/${id}`, {
+    headers: authHeaders(token),
+    cache: "no-store",
+  })
+
+  if (!response.ok) {
+    return null
+  }
+
+  return (await response.json()) as AdminCategory
+}
+
+export async function createAdminCategory(formData: FormData) {
+  const token = await requireAdminToken()
+  const response = await fetch(`${getApiGatewayUrl()}/api/admin/categories`, {
+    method: "POST",
+    headers: authHeaders(token),
+    body: JSON.stringify(categoryPayload(formData)),
+    cache: "no-store",
+  })
+
+  if (!response.ok) {
+    return {
+      ok: false as const,
+      message: await readCategoryError(response),
+    }
+  }
+
+  revalidatePath("/admin/categories")
+  revalidatePath("/admin/products/add")
+  redirect("/admin/categories")
+}
+
+export async function updateAdminCategory(id: string, formData: FormData) {
+  const token = await requireAdminToken()
+  const response = await fetch(`${getApiGatewayUrl()}/api/admin/categories/${id}`, {
+    method: "PUT",
+    headers: authHeaders(token),
+    body: JSON.stringify(categoryPayload(formData)),
+    cache: "no-store",
+  })
+
+  if (!response.ok) {
+    return {
+      ok: false as const,
+      message: await readCategoryError(response),
+    }
+  }
+
+  revalidatePath("/admin/categories")
+  revalidatePath("/admin/products/add")
+  redirect("/admin/categories")
+}
+
+export async function deleteAdminCategory(id: string) {
+  const token = await requireAdminToken()
+  const response = await fetch(`${getApiGatewayUrl()}/api/admin/categories/${id}`, {
+    method: "DELETE",
+    headers: authHeaders(token),
+    cache: "no-store",
+  })
+
+  if (!response.ok) {
+    return {
+      ok: false as const,
+      message: await readCategoryError(response),
+    }
+  }
+
+  revalidatePath("/admin/categories")
+  revalidatePath("/admin/products/add")
+
+  return { ok: true as const }
+}
+
+async function requireAdminToken() {
+  const token = await getAdminToken()
+
+  if (!token) {
+    redirect("/admin")
+  }
+
+  return token
+}
+
+function authHeaders(token: string) {
+  return {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+  }
+}
+
+function categoryPayload(formData: FormData) {
+  return {
+    name: textValue(formData, "name"),
+    slug: textValue(formData, "slug"),
+    description: textValue(formData, "description"),
+    active: formData.get("active") === "on",
+  }
+}
+
+function textValue(formData: FormData, key: string) {
+  return String(formData.get(key) ?? "").trim()
+}
+
+async function readCategoryError(response: Response) {
+  try {
+    const data = (await response.json()) as {
+      message?: string
+      validationErrors?: Record<string, string>
+    }
+
+    return (
+      data.message ??
+      Object.values(data.validationErrors ?? {})[0] ??
+      "Unable to save category."
+    )
+  } catch {
+    return "Unable to save category."
+  }
+}
