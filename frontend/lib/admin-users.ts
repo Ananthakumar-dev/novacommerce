@@ -1,7 +1,7 @@
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 
-import { getAdminToken, getApiGatewayUrl } from "@/lib/auth"
+import { getApiGatewayUrl, requireAdminToken } from "@/lib/auth"
 
 export type AdminUserRole = "ADMIN" | "CUSTOMER" | "MERCHANT"
 
@@ -18,6 +18,8 @@ export type UserFormState = {
 
 export async function listAdminUsers() {
   const token = await requireAdminToken()
+  if(!token) redirect('/admin');
+
   const response = await fetch(`${getApiGatewayUrl()}/api/auth/admin/users`, {
     headers: authHeaders(token),
     cache: "no-store",
@@ -31,7 +33,9 @@ export async function listAdminUsers() {
 }
 
 export async function getAdminUser(id: string) {
-  const token = await requireAdminToken()
+const token = await requireAdminToken()
+  if(!token) redirect('/admin');
+
   const response = await fetch(
     `${getApiGatewayUrl()}/api/auth/admin/users/${id}`,
     {
@@ -49,6 +53,8 @@ export async function getAdminUser(id: string) {
 
 export async function createAdminUser(formData: FormData) {
   const token = await requireAdminToken()
+  if(!token) redirect('/admin');
+  
   const response = await fetch(`${getApiGatewayUrl()}/api/auth/admin/users`, {
     method: "POST",
     headers: authHeaders(token),
@@ -69,6 +75,8 @@ export async function createAdminUser(formData: FormData) {
 
 export async function updateAdminUser(id: string, formData: FormData) {
   const token = await requireAdminToken()
+  if(!token) redirect('/admin');
+  
   const response = await fetch(
     `${getApiGatewayUrl()}/api/auth/admin/users/${id}`,
     {
@@ -92,6 +100,8 @@ export async function updateAdminUser(id: string, formData: FormData) {
 
 export async function deleteAdminUser(id: string) {
   const token = await requireAdminToken()
+  if(!token) redirect('/admin');
+  
   await fetch(`${getApiGatewayUrl()}/api/auth/admin/users/${id}`, {
     method: "DELETE",
     headers: authHeaders(token),
@@ -99,16 +109,6 @@ export async function deleteAdminUser(id: string) {
   })
 
   revalidatePath("/admin/users")
-}
-
-async function requireAdminToken() {
-  const token = await getAdminToken()
-
-  if (!token) {
-    redirect("/admin")
-  }
-
-  return token
 }
 
 function authHeaders(token: string) {

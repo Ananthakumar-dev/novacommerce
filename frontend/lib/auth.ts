@@ -122,3 +122,15 @@ async function readAuthError(response: Response) {
     return "Unable to sign in. Please check your credentials."
   }
 }
+
+export async function requireAdminToken() {
+  const token = await getAdminToken()
+  return token
+}
+
+export function authHeaders(token: string) {
+  return {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+  };
+}
