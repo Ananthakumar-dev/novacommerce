@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { Tag, Plus } from "lucide-react"
 
-import { listAdminCategories } from "@/lib/admin-categories"
+import { listAdminBrands } from "@/lib/admin-brands"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -22,7 +22,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-import { CategoryActions } from "./category-actions"
+import { BrandActions } from "./brand-actions"
 
 export const metadata: Metadata = {
   title: "Brands | NovaCommerce Admin",
@@ -30,58 +30,59 @@ export const metadata: Metadata = {
 }
 
 export default async function BrandsPage() {
-  const brands = await listAdminCategories()
+  const brands = await listAdminBrands()
+  console.log(brands);
 
   return (
     <main className="flex-1 bg-background text-foreground">
       <div className="mx-auto w-full max-w-6xl px-5 py-8 sm:px-8">
         <Card>
           <CardHeader>
-            <CardTitle>Categories</CardTitle>
+            <CardTitle>Brands</CardTitle>
             <CardDescription>
-              Manage product grouping and category availability.
+              Manage product makers and brand availability.
             </CardDescription>
             <CardAction>
               <Button asChild>
-                <Link href="/admin/categories/add">
+                <Link href="/admin/brands/add">
                   <Plus data-icon="inline-start" aria-hidden="true" />
-                  Add category
+                  Add brand
                 </Link>
               </Button>
             </CardAction>
           </CardHeader>
           <CardContent>
-            {categories.length ? (
+            {brands.length ? (
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Category</TableHead>
+                    <TableHead>Brand</TableHead>
                     <TableHead>Slug</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {categories.map((category) => (
-                    <TableRow key={category.id}>
+                  {brands.map((brand) => (
+                    <TableRow key={brand.id}>
                       <TableCell className="font-medium">
                         <div className="min-w-44">
-                          <div>{category.name}</div>
-                          {category.description ? (
+                          <div>{brand.name}</div>
+                          {brand.description ? (
                             <div className="mt-1 line-clamp-2 text-xs text-muted-foreground">
-                              {category.description}
+                              {brand.description}
                             </div>
                           ) : null}
                         </div>
                       </TableCell>
-                      <TableCell>{category.slug}</TableCell>
+                      <TableCell>{brand.slug}</TableCell>
                       <TableCell>
-                        <Badge variant={category.active ? "secondary" : "outline"}>
-                          {category.active ? "Active" : "Inactive"}
+                        <Badge variant={brand.active ? "secondary" : "outline"}>
+                          {brand.active ? "Active" : "Inactive"}
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <CategoryActions id={category.id} name={category.name} />
+                        <BrandActions id={brand.id} name={brand.name} />
                       </TableCell>
                     </TableRow>
                   ))}
@@ -93,9 +94,9 @@ export default async function BrandsPage() {
                   <Tag className="size-4 text-muted-foreground" />
                 </span>
                 <div>
-                  <h2 className="font-medium">No categories found</h2>
+                  <h2 className="font-medium">No brands found</h2>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    Add the first category to organize products.
+                    Add the first brand to organize products.
                   </p>
                 </div>
               </div>

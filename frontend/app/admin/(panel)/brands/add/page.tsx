@@ -1,19 +1,19 @@
 import type { Metadata } from "next"
 
-import { createCategoryAction } from "@/app/admin/(panel)/categories/actions"
+import { createBrandAction } from "@/app/admin/(panel)/brands/actions"
 
-import { CategoryForm } from "../category-form"
+import { BrandForm } from "../brand-form"
 
 export const metadata: Metadata = {
-  title: "Add Category | NovaCommerce Admin",
-  description: "Add a NovaCommerce product category.",
+  title: "Add Brand | NovaCommerce Admin",
+  description: "Add a NovaCommerce product brand.",
 }
 
-export default function AddCategoryPage() {
+export default function AddBrandPage() {
   return (
     <main className="flex-1 bg-background text-foreground">
       <div className="mx-auto w-full max-w-6xl px-5 py-8 sm:px-8">
-        <CategoryForm action={createCategoryAction} />
+        <BrandForm action={createBrandAction} />
       </div>
     </main>
   )

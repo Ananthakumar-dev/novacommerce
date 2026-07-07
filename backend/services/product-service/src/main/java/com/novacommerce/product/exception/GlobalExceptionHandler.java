@@ -29,6 +29,12 @@ public class GlobalExceptionHandler {
         return error(HttpStatus.NOT_FOUND, ex.getMessage(), request);
     }
 
+    @ExceptionHandler(BrandNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleBrandNotFound(BrandNotFoundException ex,
+                                                             HttpServletRequest request) {
+        return error(HttpStatus.NOT_FOUND, ex.getMessage(), request);
+    }
+
     @ExceptionHandler(DuplicateProductException.class)
     public ResponseEntity<ErrorResponse> handleDuplicateProduct(DuplicateProductException ex,
                                                                HttpServletRequest request) {
@@ -41,9 +47,21 @@ public class GlobalExceptionHandler {
         return error(HttpStatus.CONFLICT, ex.getMessage(), request);
     }
 
+    @ExceptionHandler(DuplicateBrandException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateBrand(DuplicateBrandException ex,
+                                                             HttpServletRequest request) {
+        return error(HttpStatus.CONFLICT, ex.getMessage(), request);
+    }
+
     @ExceptionHandler(CategoryInUseException.class)
     public ResponseEntity<ErrorResponse> handleCategoryInUse(CategoryInUseException ex,
                                                             HttpServletRequest request) {
+        return error(HttpStatus.CONFLICT, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(BrandInUseException.class)
+    public ResponseEntity<ErrorResponse> handleBrandInUse(BrandInUseException ex,
+                                                          HttpServletRequest request) {
         return error(HttpStatus.CONFLICT, ex.getMessage(), request);
     }
 

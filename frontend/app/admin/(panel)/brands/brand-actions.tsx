@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useFormStatus } from "react-dom"
 import { Pencil, Trash2 } from "lucide-react"
 
-import { deleteCategoryAction } from "@/app/admin/(panel)/categories/actions"
+import { deleteBrandAction } from "@/app/admin/(panel)/brands/actions"
 import { Button } from "@/components/ui/button"
 import {
   AlertDialog,
@@ -24,54 +24,50 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 
-type CategoryActionsProps = {
+type BrandActionsProps = {
   id: number
   name: string
 }
 
-export function CategoryActions({ id, name }: CategoryActionsProps) {
+export function BrandActions({ id, name }: BrandActionsProps) {
   return (
     <div className="flex justify-end gap-1">
       <Tooltip>
         <TooltipTrigger asChild>
           <Button variant="ghost" size="icon-sm" asChild>
-            <Link href={`/admin/categories/${id}/edit`} aria-label="Edit category">
+            <Link href={`/admin/brands/${id}/edit`} aria-label="Edit brand">
               <Pencil aria-hidden="true" />
             </Link>
           </Button>
         </TooltipTrigger>
-        <TooltipContent>Edit category</TooltipContent>
+        <TooltipContent>Edit brand</TooltipContent>
       </Tooltip>
 
       <AlertDialog>
         <Tooltip>
           <TooltipTrigger asChild>
             <AlertDialogTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                aria-label="Delete category"
-              >
+              <Button variant="ghost" size="icon-sm" aria-label="Delete brand">
                 <Trash2 aria-hidden="true" />
               </Button>
             </AlertDialogTrigger>
           </TooltipTrigger>
-          <TooltipContent>Delete category</TooltipContent>
+          <TooltipContent>Delete brand</TooltipContent>
         </Tooltip>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogMedia>
               <Trash2 aria-hidden="true" />
             </AlertDialogMedia>
-            <AlertDialogTitle>Delete category</AlertDialogTitle>
+            <AlertDialogTitle>Delete brand</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete {name}. Categories assigned to
-              products cannot be deleted.
+              This will permanently delete {name}. Brands assigned to products
+              cannot be deleted.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <form action={deleteCategoryAction}>
+            <form action={deleteBrandAction}>
               <input type="hidden" name="id" value={id} />
               <DeleteButton />
             </form>
@@ -86,11 +82,7 @@ function DeleteButton() {
   const { pending } = useFormStatus()
 
   return (
-    <AlertDialogAction
-      type="submit"
-      variant="destructive"
-      disabled={pending}
-    >
+    <AlertDialogAction type="submit" variant="destructive" disabled={pending}>
       {pending ? "Deleting..." : "Delete"}
     </AlertDialogAction>
   )

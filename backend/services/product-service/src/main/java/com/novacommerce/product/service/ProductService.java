@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 
 import org.springframework.stereotype.Service;
 
-import com.novacommerce.product.config.ProductOptions;
 import com.novacommerce.product.dto.ProductOptionsResponse;
 import com.novacommerce.product.dto.ProductRequest;
 import com.novacommerce.product.dto.ProductResponse;
@@ -16,6 +15,7 @@ import com.novacommerce.product.enums.ProductStatus;
 import com.novacommerce.product.exception.DuplicateProductException;
 import com.novacommerce.product.exception.InvalidProductOptionException;
 import com.novacommerce.product.exception.ProductNotFoundException;
+import com.novacommerce.product.repository.BrandRepository;
 import com.novacommerce.product.repository.CategoryRepository;
 import com.novacommerce.product.repository.ProductRepository;
 
@@ -29,6 +29,7 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final BrandRepository brandRepository;
 
     public List<ProductResponse> listProducts() {
         return productRepository.findAll()
@@ -125,7 +126,12 @@ public class ProductService {
                 .map(category -> category.getName())
                 .toList();
 
-        return new ProductOptionsResponse(categories, ProductOptions.BRANDS, statuses);
+        var brands = brandRepository.findByActiveTrueOrderByNameAsc()
+                .stream()
+                .map(brand -> brand.getName())
+                .toList();
+
+        return new ProductOptionsResponse(categories, brands, statuses);
     }
 
     private Product findProduct(Long id) {
@@ -138,7 +144,7 @@ public class ProductService {
             throw new InvalidProductOptionException("Invalid category selected");
         }
 
-        if (!ProductOptions.BRANDS.contains(normalizeRequired(request.getBrand()))) {
+        if (!brandRepository.existsByNameIgnoreCaseAndActiveTrue(normalizeRequired(request.getBrand()))) {
             throw new InvalidProductOptionException("Invalid brand selected");
         }
     }

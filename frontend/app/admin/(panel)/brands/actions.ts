@@ -1,59 +1,59 @@
 "use server"
 
 import {
-  createAdminCategory,
-  deleteAdminCategory,
-  updateAdminCategory,
-  type CategoryFormState,
-} from "@/lib/admin-categories"
+  createAdminBrand,
+  deleteAdminBrand,
+  updateAdminBrand,
+  type BrandFormState,
+} from "@/lib/admin-brands"
 
-export async function createCategoryAction(
-  _previousState: CategoryFormState,
+export async function createBrandAction(
+  _previousState: BrandFormState,
   formData: FormData
-): Promise<CategoryFormState> {
-  const validationError = validateCategoryForm(formData)
+): Promise<BrandFormState> {
+  const validationError = validateBrandForm(formData)
 
   if (validationError) {
     return { error: validationError }
   }
 
-  const result = await createAdminCategory(formData)
+  const result = await createAdminBrand(formData)
 
   return result.ok ? {} : { error: result.message }
 }
 
-export async function updateCategoryAction(
+export async function updateBrandAction(
   id: string,
-  _previousState: CategoryFormState,
+  _previousState: BrandFormState,
   formData: FormData
-): Promise<CategoryFormState> {
-  const validationError = validateCategoryForm(formData)
+): Promise<BrandFormState> {
+  const validationError = validateBrandForm(formData)
 
   if (validationError) {
     return { error: validationError }
   }
 
-  const result = await updateAdminCategory(id, formData)
+  const result = await updateAdminBrand(id, formData)
 
   return result.ok ? {} : { error: result.message }
 }
 
-export async function deleteCategoryAction(formData: FormData) {
+export async function deleteBrandAction(formData: FormData) {
   const id = String(formData.get("id") ?? "")
 
   if (!id) {
     return
   }
 
-  await deleteAdminCategory(id)
+  await deleteAdminBrand(id)
 }
 
-function validateCategoryForm(formData: FormData) {
+function validateBrandForm(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim()
   const description = String(formData.get("description") ?? "").trim()
 
   if (!name) {
-    return "Category name is required."
+    return "Brand name is required."
   }
 
   if (description.length > 500) {

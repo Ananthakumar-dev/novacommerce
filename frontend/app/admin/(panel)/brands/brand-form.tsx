@@ -5,10 +5,7 @@ import { useActionState } from "react"
 import { useFormStatus } from "react-dom"
 import { AlertCircle, ArrowLeft, Save } from "lucide-react"
 
-import type {
-  AdminCategory,
-  CategoryFormState,
-} from "@/lib/admin-categories"
+import type { AdminBrand, BrandFormState } from "@/lib/admin-brands"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -22,28 +19,28 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
 
-type CategoryFormProps = {
+type BrandFormProps = {
   action: (
-    previousState: CategoryFormState,
+    previousState: BrandFormState,
     formData: FormData
-  ) => Promise<CategoryFormState>
-  category?: AdminCategory
+  ) => Promise<BrandFormState>
+  brand?: AdminBrand
 }
 
-const initialState: CategoryFormState = {}
+const initialState: BrandFormState = {}
 
-export function CategoryForm({ action, category }: CategoryFormProps) {
+export function BrandForm({ action, brand }: BrandFormProps) {
   const [state, formAction] = useActionState(action, initialState)
-  const isEditing = Boolean(category)
+  const isEditing = Boolean(brand)
 
   return (
     <Card className="max-w-2xl">
       <CardHeader>
-        <CardTitle>{isEditing ? "Edit category" : "Add category"}</CardTitle>
+        <CardTitle>{isEditing ? "Edit brand" : "Add brand"}</CardTitle>
         <CardDescription>
           {isEditing
-            ? "Update category details and product availability."
-            : "Create a category for product organization."}
+            ? "Update brand details and product availability."
+            : "Create a brand for product organization."}
         </CardDescription>
       </CardHeader>
       <form action={formAction}>
@@ -63,12 +60,12 @@ export function CategoryForm({ action, category }: CategoryFormProps) {
 
           <div className="grid gap-5 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="name">Category name</Label>
+              <Label htmlFor="name">Brand name</Label>
               <Input
                 id="name"
                 name="name"
-                defaultValue={category?.name}
-                placeholder="Electronics"
+                defaultValue={brand?.name}
+                placeholder="Apple"
                 required
               />
             </div>
@@ -78,7 +75,7 @@ export function CategoryForm({ action, category }: CategoryFormProps) {
               <Input
                 id="slug"
                 name="slug"
-                defaultValue={category?.slug}
+                defaultValue={brand?.slug}
                 placeholder="Auto-generated if blank"
               />
             </div>
@@ -89,7 +86,7 @@ export function CategoryForm({ action, category }: CategoryFormProps) {
             <Textarea
               id="description"
               name="description"
-              defaultValue={category?.description ?? ""}
+              defaultValue={brand?.description ?? ""}
               rows={4}
             />
           </div>
@@ -98,7 +95,7 @@ export function CategoryForm({ action, category }: CategoryFormProps) {
             <input
               name="active"
               type="checkbox"
-              defaultChecked={category?.active ?? true}
+              defaultChecked={brand?.active ?? true}
               className="size-4 rounded border-input accent-primary"
             />
             Active
@@ -107,7 +104,7 @@ export function CategoryForm({ action, category }: CategoryFormProps) {
 
         <CardFooter className="justify-between gap-3">
           <Button variant="outline" asChild>
-            <Link href="/admin/categories">
+            <Link href="/admin/brands">
               <ArrowLeft data-icon="inline-start" aria-hidden="true" />
               Back
             </Link>
@@ -119,10 +116,7 @@ export function CategoryForm({ action, category }: CategoryFormProps) {
   )
 }
 
-function Textarea({
-  className,
-  ...props
-}: React.ComponentProps<"textarea">) {
+function Textarea({ className, ...props }: React.ComponentProps<"textarea">) {
   return (
     <textarea
       className={cn(
@@ -140,7 +134,7 @@ function SubmitButton({ isEditing }: { isEditing: boolean }) {
   return (
     <Button type="submit" disabled={pending}>
       <Save data-icon="inline-start" aria-hidden="true" />
-      {pending ? "Saving..." : isEditing ? "Save changes" : "Add category"}
+      {pending ? "Saving..." : isEditing ? "Save changes" : "Add brand"}
     </Button>
   )
 }
