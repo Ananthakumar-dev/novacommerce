@@ -31,7 +31,6 @@ export const metadata: Metadata = {
 
 export default async function BrandsPage() {
   const brands = await listAdminBrands()
-  console.log(brands);
 
   return (
     <main className="flex-1 bg-background text-foreground">
