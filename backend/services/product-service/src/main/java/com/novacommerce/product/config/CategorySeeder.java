@@ -17,10 +17,18 @@ public class CategorySeeder implements CommandLineRunner {
     @Override
     public void run(String... args) {
         ProductOptions.CATEGORIES.forEach(name -> {
-            if (!categoryRepository.existsByNameIgnoreCase(name)) {
+            var existing = categoryRepository.findByNameIgnoreCase(name);
+            if (existing.isPresent()) {
+                var category = existing.get();
+                if (category.getIcon() == null || category.getIcon().isBlank()) {
+                    category.setIcon(defaultIcon(name));
+                    categoryRepository.save(category);
+                }
+            } else {
                 categoryRepository.save(Category.builder()
                         .name(name)
                         .slug(slugify(name))
+                        .icon(defaultIcon(name))
                         .active(true)
                         .build());
             }
@@ -31,5 +39,21 @@ public class CategorySeeder implements CommandLineRunner {
         return value.toLowerCase()
                 .replaceAll("[^a-z0-9]+", "-")
                 .replaceAll("(^-|-$)", "");
+    }
+
+    private String defaultIcon(String name) {
+        return switch (name) {
+            case "Electronics" -> "Smartphone";
+            case "Fashion" -> "Shirt";
+            case "Home & Kitchen" -> "House";
+            case "Beauty & Personal Care" -> "Sparkles";
+            case "Sports & Fitness" -> "Dumbbell";
+            case "Books" -> "BookOpen";
+            case "Toys & Games" -> "Gamepad2";
+            case "Grocery" -> "ShoppingBasket";
+            case "Automotive" -> "Car";
+            case "Health" -> "HeartPulse";
+            default -> "FolderTree";
+        };
     }
 }

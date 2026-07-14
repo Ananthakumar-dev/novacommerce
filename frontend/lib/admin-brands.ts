@@ -2,6 +2,7 @@ import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 
 import { authHeaders, getApiGatewayUrl, requireAdminToken } from "@/lib/auth"
+import { uploadAdminImage } from "@/lib/admin-media"
 import { textValue } from "./utils"
 
 export type AdminBrand = {
@@ -9,6 +10,7 @@ export type AdminBrand = {
   name: string
   slug: string
   description: string | null
+  image: string | null
   active: boolean
   createdAt: string
   updatedAt: string
@@ -55,10 +57,16 @@ export async function getAdminBrand(id: string) {
 export async function createAdminBrand(formData: FormData) {
   const token = await requireAdminToken()
   if (!token) redirect("/admin")
+  const payload = await resolveBrandPayload(formData)
+
+  if (!payload.ok) {
+    return payload
+  }
+
   const response = await fetch(`${getApiGatewayUrl()}/api/admin/brands`, {
     method: "POST",
     headers: authHeaders(token),
-    body: JSON.stringify(brandPayload(formData)),
+    body: JSON.stringify(payload.data),
     cache: "no-store",
   })
 
@@ -77,10 +85,16 @@ export async function createAdminBrand(formData: FormData) {
 export async function updateAdminBrand(id: string, formData: FormData) {
   const token = await requireAdminToken()
   if (!token) redirect("/admin")
+  const payload = await resolveBrandPayload(formData)
+
+  if (!payload.ok) {
+    return payload
+  }
+
   const response = await fetch(`${getApiGatewayUrl()}/api/admin/brands/${id}`, {
     method: "PUT",
     headers: authHeaders(token),
-    body: JSON.stringify(brandPayload(formData)),
+    body: JSON.stringify(payload.data),
     cache: "no-store",
   })
 
@@ -118,12 +132,29 @@ export async function deleteAdminBrand(id: string) {
   return { ok: true as const }
 }
 
-function brandPayload(formData: FormData) {
+async function brandPayload(formData: FormData) {
+  const uploadedImageUrl = await uploadAdminImage(formData.get("imageFile"))
+
   return {
     name: textValue(formData, "name"),
     slug: textValue(formData, "slug"),
     description: textValue(formData, "description"),
+    image: uploadedImageUrl ?? textValue(formData, "image"),
     active: formData.get("active") === "on",
+  }
+}
+
+async function resolveBrandPayload(formData: FormData) {
+  try {
+    return {
+      ok: true as const,
+      data: await brandPayload(formData),
+    }
+  } catch (error) {
+    return {
+      ok: false as const,
+      message: error instanceof Error ? error.message : "Unable to upload image.",
+    }
   }
 }
 

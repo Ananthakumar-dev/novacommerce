@@ -36,6 +36,10 @@ public class Category {
     @Column(length = 500)
     private String description;
 
+    private String icon;
+
+    private String image;
+
     @Column(nullable = false)
     private Boolean active;
 

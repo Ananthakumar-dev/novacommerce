@@ -2,7 +2,9 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { Tag, Plus } from "lucide-react"
 
+import { EntityMark } from "@/components/admin/icon-picker"
 import { listAdminBrands } from "@/lib/admin-brands"
+import { mediaUrl } from "@/lib/admin-media"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -65,13 +67,19 @@ export default async function BrandsPage() {
                   {brands.map((brand) => (
                     <TableRow key={brand.id}>
                       <TableCell className="font-medium">
-                        <div className="min-w-44">
-                          <div>{brand.name}</div>
-                          {brand.description ? (
-                            <div className="mt-1 line-clamp-2 text-xs text-muted-foreground">
-                              {brand.description}
-                            </div>
-                          ) : null}
+                        <div className="flex min-w-44 items-center gap-3">
+                          <EntityMark
+                            image={mediaUrl(brand.image)}
+                            label={brand.name}
+                          />
+                          <div className="min-w-0">
+                            <div>{brand.name}</div>
+                            {brand.description ? (
+                              <div className="mt-1 line-clamp-2 text-xs text-muted-foreground">
+                                {brand.description}
+                              </div>
+                            ) : null}
+                          </div>
                         </div>
                       </TableCell>
                       <TableCell>{brand.slug}</TableCell>

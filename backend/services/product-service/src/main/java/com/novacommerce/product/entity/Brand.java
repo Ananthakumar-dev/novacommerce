@@ -36,6 +36,8 @@ public class Brand {
     @Column(length = 500)
     private String description;
 
+    private String image;
+
     @Column(nullable = false)
     private Boolean active;
 

@@ -14,6 +14,7 @@ public class BrandResponse {
     private String name;
     private String slug;
     private String description;
+    private String image;
     private Boolean active;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -24,6 +25,7 @@ public class BrandResponse {
                 .name(brand.getName())
                 .slug(brand.getSlug())
                 .description(brand.getDescription())
+                .image(brand.getImage())
                 .active(brand.getActive())
                 .createdAt(brand.getCreatedAt())
                 .updatedAt(brand.getUpdatedAt())

@@ -9,6 +9,7 @@ import type {
   AdminCategory,
   CategoryFormState,
 } from "@/lib/admin-categories"
+import { IconPicker } from "@/components/admin/icon-picker"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -92,6 +93,27 @@ export function CategoryForm({ action, category }: CategoryFormProps) {
               defaultValue={category?.description ?? ""}
               rows={4}
             />
+          </div>
+
+          <IconPicker
+            defaultValue={category?.icon}
+            fallbackIcon="FolderTree"
+          />
+
+          <div className="space-y-2">
+            <Label htmlFor="imageFile">Image</Label>
+            <input type="hidden" name="image" value={category?.image ?? ""} />
+            <Input
+              id="imageFile"
+              name="imageFile"
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/svg+xml"
+            />
+            {category?.image ? (
+              <p className="text-xs text-muted-foreground">
+                Current image saved
+              </p>
+            ) : null}
           </div>
 
           <label className="flex w-fit items-center gap-2 text-sm font-medium">

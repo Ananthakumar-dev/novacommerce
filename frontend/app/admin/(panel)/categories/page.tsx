@@ -2,7 +2,9 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { FolderTree, Plus } from "lucide-react"
 
+import { EntityMark } from "@/components/admin/icon-picker"
 import { listAdminCategories } from "@/lib/admin-categories"
+import { mediaUrl } from "@/lib/admin-media"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -65,13 +67,20 @@ export default async function CategoriesPage() {
                   {categories.map((category) => (
                     <TableRow key={category.id}>
                       <TableCell className="font-medium">
-                        <div className="min-w-44">
-                          <div>{category.name}</div>
-                          {category.description ? (
-                            <div className="mt-1 line-clamp-2 text-xs text-muted-foreground">
-                              {category.description}
-                            </div>
-                          ) : null}
+                        <div className="flex min-w-44 items-center gap-3">
+                          <EntityMark
+                            icon={category.icon}
+                            image={mediaUrl(category.image)}
+                            label={category.name}
+                          />
+                          <div className="min-w-0">
+                            <div>{category.name}</div>
+                            {category.description ? (
+                              <div className="mt-1 line-clamp-2 text-xs text-muted-foreground">
+                                {category.description}
+                              </div>
+                            ) : null}
+                          </div>
                         </div>
                       </TableCell>
                       <TableCell>{category.slug}</TableCell>

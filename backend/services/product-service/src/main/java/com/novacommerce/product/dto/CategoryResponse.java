@@ -14,6 +14,8 @@ public class CategoryResponse {
     private String name;
     private String slug;
     private String description;
+    private String icon;
+    private String image;
     private Boolean active;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -24,6 +26,8 @@ public class CategoryResponse {
                 .name(category.getName())
                 .slug(category.getSlug())
                 .description(category.getDescription())
+                .icon(category.getIcon())
+                .image(category.getImage())
                 .active(category.getActive())
                 .createdAt(category.getCreatedAt())
                 .updatedAt(category.getUpdatedAt())

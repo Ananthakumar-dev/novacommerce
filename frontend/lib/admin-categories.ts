@@ -2,6 +2,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { authHeaders, getApiGatewayUrl, requireAdminToken } from "@/lib/auth";
+import { uploadAdminImage } from "@/lib/admin-media";
 import { textValue } from "./utils";
 
 export type AdminCategory = {
@@ -9,6 +10,8 @@ export type AdminCategory = {
   name: string;
   slug: string;
   description: string | null;
+  icon: string | null;
+  image: string | null;
   active: boolean;
   createdAt: string;
   updatedAt: string;
@@ -55,10 +58,16 @@ export async function getAdminCategory(id: string) {
 export async function createAdminCategory(formData: FormData) {
   const token = await requireAdminToken();
   if (!token) redirect("/admin");
+  const payload = await resolveCategoryPayload(formData);
+
+  if (!payload.ok) {
+    return payload;
+  }
+
   const response = await fetch(`${getApiGatewayUrl()}/api/admin/categories`, {
     method: "POST",
     headers: authHeaders(token),
-    body: JSON.stringify(categoryPayload(formData)),
+    body: JSON.stringify(payload.data),
     cache: "no-store",
   });
 
@@ -77,12 +86,18 @@ export async function createAdminCategory(formData: FormData) {
 export async function updateAdminCategory(id: string, formData: FormData) {
   const token = await requireAdminToken();
   if (!token) redirect("/admin");
+  const payload = await resolveCategoryPayload(formData);
+
+  if (!payload.ok) {
+    return payload;
+  }
+
   const response = await fetch(
     `${getApiGatewayUrl()}/api/admin/categories/${id}`,
     {
       method: "PUT",
       headers: authHeaders(token),
-      body: JSON.stringify(categoryPayload(formData)),
+      body: JSON.stringify(payload.data),
       cache: "no-store",
     },
   );
@@ -124,13 +139,31 @@ export async function deleteAdminCategory(id: string) {
   return { ok: true as const };
 }
 
-function categoryPayload(formData: FormData) {
+async function categoryPayload(formData: FormData) {
+  const uploadedImageUrl = await uploadAdminImage(formData.get("imageFile"));
+
   return {
     name: textValue(formData, "name"),
     slug: textValue(formData, "slug"),
     description: textValue(formData, "description"),
+    icon: textValue(formData, "icon"),
+    image: uploadedImageUrl ?? textValue(formData, "image"),
     active: formData.get("active") === "on",
   };
+}
+
+async function resolveCategoryPayload(formData: FormData) {
+  try {
+    return {
+      ok: true as const,
+      data: await categoryPayload(formData),
+    };
+  } catch (error) {
+    return {
+      ok: false as const,
+      message: error instanceof Error ? error.message : "Unable to upload image.",
+    };
+  }
 }
 
 async function readCategoryError(response: Response) {

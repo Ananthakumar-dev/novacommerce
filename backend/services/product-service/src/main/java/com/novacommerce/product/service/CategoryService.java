@@ -54,6 +54,8 @@ public class CategoryService {
                 .name(name)
                 .slug(slug)
                 .description(normalizeOptional(request.getDescription()))
+                .icon(normalizeOptional(request.getIcon()))
+                .image(normalizeOptional(request.getImage()))
                 .active(request.getActive() == null || request.getActive())
                 .build();
 
@@ -76,6 +78,8 @@ public class CategoryService {
         category.setName(name);
         category.setSlug(slug);
         category.setDescription(normalizeOptional(request.getDescription()));
+        category.setIcon(normalizeOptional(request.getIcon()));
+        category.setImage(normalizeOptional(request.getImage()));
         category.setActive(request.getActive() == null || request.getActive());
 
         return CategoryResponse.from(categoryRepository.save(category));

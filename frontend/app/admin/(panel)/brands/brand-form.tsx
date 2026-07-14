@@ -91,6 +91,22 @@ export function BrandForm({ action, brand }: BrandFormProps) {
             />
           </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="imageFile">Brand image</Label>
+            <input type="hidden" name="image" value={brand?.image ?? ""} />
+            <Input
+              id="imageFile"
+              name="imageFile"
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/svg+xml"
+            />
+            {brand?.image ? (
+              <p className="text-xs text-muted-foreground">
+                Current image saved
+              </p>
+            ) : null}
+          </div>
+
           <label className="flex w-fit items-center gap-2 text-sm font-medium">
             <input
               name="active"

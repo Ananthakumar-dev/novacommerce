@@ -17,7 +17,8 @@ public class BrandSeeder implements CommandLineRunner {
     @Override
     public void run(String... args) {
         ProductOptions.BRANDS.forEach(name -> {
-            if (!brandRepository.existsByNameIgnoreCase(name)) {
+            var existing = brandRepository.findByNameIgnoreCase(name);
+            if (existing.isEmpty()) {
                 brandRepository.save(Brand.builder()
                         .name(name)
                         .slug(slugify(name))

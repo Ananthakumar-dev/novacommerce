@@ -14,5 +14,9 @@ public class CategoryRequest {
     @Size(max = 500, message = "Description must be 500 characters or less")
     private String description;
 
+    private String icon;
+
+    private String image;
+
     private Boolean active;
 }

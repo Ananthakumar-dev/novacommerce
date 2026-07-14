@@ -28,7 +28,6 @@ public class BrandService {
     private final ProductRepository productRepository;
 
     public List<BrandResponse> listBrands() {
-        System.out.println("list brands");
         return brandRepository.findAllByOrderByNameAsc()
                 .stream()
                 .map(BrandResponse::from)
@@ -55,6 +54,7 @@ public class BrandService {
                 .name(name)
                 .slug(slug)
                 .description(normalizeOptional(request.getDescription()))
+                .image(normalizeOptional(request.getImage()))
                 .active(request.getActive() == null || request.getActive())
                 .build();
 
@@ -77,6 +77,7 @@ public class BrandService {
         brand.setName(name);
         brand.setSlug(slug);
         brand.setDescription(normalizeOptional(request.getDescription()));
+        brand.setImage(normalizeOptional(request.getImage()));
         brand.setActive(request.getActive() == null || request.getActive());
 
         return BrandResponse.from(brandRepository.save(brand));
