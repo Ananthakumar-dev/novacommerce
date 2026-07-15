@@ -5,8 +5,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.novacommerce.product.dto.ProductPageResponse;
+import com.novacommerce.product.dto.ProductPopularRequest;
 import com.novacommerce.product.dto.ProductOptionsResponse;
 import com.novacommerce.product.dto.ProductRequest;
 import com.novacommerce.product.dto.ProductResponse;
@@ -31,11 +35,18 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
     private final BrandRepository brandRepository;
 
-    public List<ProductResponse> listProducts() {
-        return productRepository.findAll()
+    public ProductPageResponse listProducts(int page, int size) {
+        var safePage = Math.max(page, 0);
+        var safeSize = Math.min(Math.max(size, 1), 50);
+        var pageable = PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.DESC, "createdAt"));
+        var products = productRepository.findAll(pageable);
+        var items = products.getContent()
                 .stream()
                 .map(ProductResponse::from)
                 .toList();
+
+        return new ProductPageResponse(items, products.getNumber(), products.getSize(),
+                products.getTotalElements(), products.getTotalPages());
     }
 
     public ProductResponse getProduct(Long id) {
@@ -70,6 +81,7 @@ public class ProductService {
                 .brand(normalizeRequired(request.getBrand()))
                 .imageUrl(normalizeOptional(request.getImageUrl()))
                 .featured(Boolean.TRUE.equals(request.getFeatured()))
+                .popular(Boolean.TRUE.equals(request.getPopular()))
                 .metaTitle(normalizeOptional(request.getMetaTitle()))
                 .metaDescription(normalizeOptional(request.getMetaDescription()))
                 .build();
@@ -105,6 +117,7 @@ public class ProductService {
         product.setBrand(normalizeRequired(request.getBrand()));
         product.setImageUrl(normalizeOptional(request.getImageUrl()));
         product.setFeatured(Boolean.TRUE.equals(request.getFeatured()));
+        product.setPopular(Boolean.TRUE.equals(request.getPopular()));
         product.setMetaTitle(normalizeOptional(request.getMetaTitle()));
         product.setMetaDescription(normalizeOptional(request.getMetaDescription()));
 
@@ -114,6 +127,13 @@ public class ProductService {
     public void deleteProduct(Long id) {
         var product = findProduct(id);
         productRepository.delete(product);
+    }
+
+    public ProductResponse updatePopular(Long id, ProductPopularRequest request) {
+        var product = findProduct(id);
+        product.setPopular(Boolean.TRUE.equals(request.getPopular()));
+
+        return ProductResponse.from(productRepository.save(product));
     }
 
     public ProductOptionsResponse getProductOptions() {

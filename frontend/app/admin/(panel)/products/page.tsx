@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { Package, Plus } from "lucide-react"
+import { ChevronLeft, ChevronRight, Package, Plus } from "lucide-react"
 
 import { listAdminProducts, type ProductStatus } from "@/lib/admin-products"
 import { Badge } from "@/components/ui/badge"
@@ -23,14 +23,30 @@ import {
 } from "@/components/ui/table"
 
 import { ProductActions } from "./product-actions"
+import { PopularToggle } from "./popular-toggle"
 
 export const metadata: Metadata = {
   title: "Products | NovaCommerce Admin",
   description: "Manage NovaCommerce products.",
 }
 
-export default async function ProductsPage() {
-  const products = await listAdminProducts()
+type ProductsPageProps = {
+  searchParams: Promise<{
+    page?: string
+  }>
+}
+
+const PAGE_SIZE = 10
+
+export default async function ProductsPage({ searchParams }: ProductsPageProps) {
+  const { page } = await searchParams
+  const currentPage = Math.max(Number(page ?? "1") || 1, 1)
+  const productsPage = await listAdminProducts({
+    page: currentPage - 1,
+    size: PAGE_SIZE,
+  })
+  const products = productsPage.items
+  const totalPages = productsPage.totalPages
 
   return (
     <main className="flex-1 bg-background text-foreground">
@@ -61,6 +77,7 @@ export default async function ProductsPage() {
                     <TableHead>Brand</TableHead>
                     <TableHead>Price</TableHead>
                     <TableHead>Stock</TableHead>
+                    <TableHead>Popular</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
@@ -81,6 +98,12 @@ export default async function ProductsPage() {
                       <TableCell>{product.brand}</TableCell>
                       <TableCell>{formatCurrency(product.salePrice ?? product.price)}</TableCell>
                       <TableCell>{product.stockQuantity}</TableCell>
+                      <TableCell>
+                        <PopularToggle
+                          id={product.id}
+                          popular={product.popular}
+                        />
+                      </TableCell>
                       <TableCell>
                         <Badge variant={statusVariant(product.status)}>
                           {statusLabel(product.status)}
@@ -106,6 +129,44 @@ export default async function ProductsPage() {
                 </div>
               </div>
             )}
+            {totalPages > 1 ? (
+              <div className="mt-5 flex flex-col gap-3 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-sm text-muted-foreground">
+                  Page {productsPage.page + 1} of {totalPages} -{" "}
+                  {productsPage.totalItems} products
+                </p>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    asChild
+                    disabled={currentPage <= 1}
+                  >
+                    <Link
+                      href={`/admin/products?page=${Math.max(currentPage - 1, 1)}`}
+                      aria-disabled={currentPage <= 1}
+                    >
+                      <ChevronLeft data-icon="inline-start" aria-hidden="true" />
+                      Previous
+                    </Link>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    asChild
+                    disabled={currentPage >= totalPages}
+                  >
+                    <Link
+                      href={`/admin/products?page=${Math.min(currentPage + 1, totalPages)}`}
+                      aria-disabled={currentPage >= totalPages}
+                    >
+                      Next
+                      <ChevronRight data-icon="inline-end" aria-hidden="true" />
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            ) : null}
           </CardContent>
         </Card>
       </div>

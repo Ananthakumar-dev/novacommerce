@@ -52,6 +52,8 @@ public class ProductRequest {
 
     private Boolean featured;
 
+    private Boolean popular;
+
     private String metaTitle;
 
     @Size(max = 500, message = "Meta description must be 500 characters or less")

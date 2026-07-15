@@ -3,6 +3,7 @@
 import {
   createAdminProduct,
   deleteAdminProduct,
+  updateAdminProductPopular,
   updateAdminProduct,
   type ProductFormState,
 } from "@/lib/admin-products"
@@ -43,6 +44,15 @@ export async function deleteProductAction(formData: FormData) {
 
   if (id) {
     await deleteAdminProduct(id)
+  }
+}
+
+export async function toggleProductPopularAction(formData: FormData) {
+  const id = String(formData.get("id") ?? "")
+  const popular = String(formData.get("popular") ?? "") === "true"
+
+  if (id) {
+    await updateAdminProductPopular(id, popular)
   }
 }
 

@@ -27,6 +27,7 @@ public class ProductResponse {
     private String brand;
     private String imageUrl;
     private Boolean featured;
+    private Boolean popular;
     private String metaTitle;
     private String metaDescription;
     private LocalDateTime createdAt;
@@ -49,6 +50,7 @@ public class ProductResponse {
                 .brand(product.getBrand())
                 .imageUrl(product.getImageUrl())
                 .featured(product.getFeatured())
+                .popular(product.getPopular())
                 .metaTitle(product.getMetaTitle())
                 .metaDescription(product.getMetaDescription())
                 .createdAt(product.getCreatedAt())

@@ -266,6 +266,16 @@ export function ProductForm({ action, options, product }: ProductFormProps) {
             />
             Featured product
           </label>
+
+          <label className="flex w-fit items-center gap-2 text-sm font-medium">
+            <input
+              name="popular"
+              type="checkbox"
+              defaultChecked={product?.popular ?? false}
+              className="size-4 rounded border-input accent-primary"
+            />
+            Popular product
+          </label>
         </CardContent>
 
         <CardFooter className="justify-between gap-3">

@@ -21,6 +21,7 @@ export type AdminProduct = {
   brand: string;
   imageUrl: string | null;
   featured: boolean;
+  popular: boolean;
   metaTitle: string | null;
   metaDescription: string | null;
   createdAt: string;
@@ -33,23 +34,50 @@ export type ProductOptions = {
   statuses: ProductStatus[];
 };
 
+export type ProductPage = {
+  items: AdminProduct[];
+  page: number;
+  size: number;
+  totalItems: number;
+  totalPages: number;
+};
+
 export type ProductFormState = {
   error?: string;
 };
 
-export async function listAdminProducts() {
+export async function listAdminProducts({
+  page = 0,
+  size = 10,
+}: {
+  page?: number;
+  size?: number;
+} = {}) {
   const token = await requireAdminToken();
   if (!token) redirect("/admin");
-  const response = await fetch(`${getApiGatewayUrl()}/api/admin/products`, {
-    headers: authHeaders(token),
-    cache: "no-store",
+  const params = new URLSearchParams({
+    page: String(page),
+    size: String(size),
   });
+  const response = await fetch(
+    `${getApiGatewayUrl()}/api/admin/products?${params}`,
+    {
+      headers: authHeaders(token),
+      cache: "no-store",
+    },
+  );
 
   if (!response.ok) {
-    return [];
+    return {
+      items: [],
+      page,
+      size,
+      totalItems: 0,
+      totalPages: 0,
+    } satisfies ProductPage;
   }
 
-  return (await response.json()) as AdminProduct[];
+  return (await response.json()) as ProductPage;
 }
 
 export async function getAdminProduct(id: string) {
@@ -149,6 +177,33 @@ export async function deleteAdminProduct(id: string) {
   revalidatePath("/admin/products");
 }
 
+export async function updateAdminProductPopular(id: string, popular: boolean) {
+  const token = await requireAdminToken();
+  if (!token) redirect("/admin");
+  const response = await fetch(
+    `${getApiGatewayUrl()}/api/admin/products/${id}/popular`,
+    {
+      method: "PATCH",
+      headers: authHeaders(token),
+      body: JSON.stringify({ popular }),
+      cache: "no-store",
+    },
+  );
+
+  if (!response.ok) {
+    return {
+      ok: false as const,
+      message: await readProductError(response),
+    };
+  }
+
+  revalidatePath("/admin/products");
+
+  return {
+    ok: true as const,
+  };
+}
+
 function productPayload(formData: FormData) {
   return {
     name: textValue(formData, "name"),
@@ -165,6 +220,7 @@ function productPayload(formData: FormData) {
     brand: textValue(formData, "brand"),
     imageUrl: textValue(formData, "imageUrl"),
     featured: formData.get("featured") === "on",
+    popular: formData.get("popular") === "on",
     metaTitle: textValue(formData, "metaTitle"),
     metaDescription: textValue(formData, "metaDescription"),
   };
