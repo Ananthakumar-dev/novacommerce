@@ -34,6 +34,13 @@ public class CategoryService {
                 .toList();
     }
 
+    public List<CategoryResponse> listStorefrontCategories() {
+        return categoryRepository.findByActiveTrueOrderByNameAsc()
+                .stream()
+                .map(CategoryResponse::from)
+                .toList();
+    }
+
     public CategoryResponse getCategory(Long id) {
         return CategoryResponse.from(findCategory(id));
     }

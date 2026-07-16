@@ -34,6 +34,13 @@ public class BrandService {
                 .toList();
     }
 
+    public List<BrandResponse> listStorefrontBrands() {
+        return brandRepository.findByActiveTrueOrderByNameAsc()
+                .stream()
+                .map(BrandResponse::from)
+                .toList();
+    }
+
     public BrandResponse getBrand(Long id) {
         return BrandResponse.from(findBrand(id));
     }

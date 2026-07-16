@@ -3,8 +3,16 @@ import {
   ArrowRight,
   BadgeCheck,
   CreditCard,
+  Headphones,
+  Home as HomeIcon,
+  Laptop,
+  Package,
   RotateCcw,
+  Shirt,
+  Smartphone,
+  Sparkles,
   Truck,
+  Watch,
 } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
@@ -17,14 +25,16 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import {
-  categories,
-  featuredCollections,
-  products,
-} from "@/components/site/commerce-data"
 import { ProductCard } from "@/components/site/product-card"
 import { SiteFooter } from "@/components/site/site-footer"
 import { SiteHeader } from "@/components/site/site-header"
+import {
+  listFeaturedProducts,
+  listPopularProducts,
+  listStorefrontCategories,
+  listStorefrontProducts,
+  type StorefrontCategory,
+} from "@/lib/storefront"
 
 const services = [
   { title: "Fast delivery", caption: "Priority shipping on popular products", icon: Truck },
@@ -33,7 +43,57 @@ const services = [
   { title: "Verified picks", caption: "Curated listings with clear product signals", icon: BadgeCheck },
 ]
 
-export default function Home() {
+const categoryIconMap = {
+  audio: Headphones,
+  beauty: Sparkles,
+  electronics: Laptop,
+  fashion: Shirt,
+  health: BadgeCheck,
+  home: HomeIcon,
+  mobiles: Smartphone,
+  mobile: Smartphone,
+  smartphones: Smartphone,
+  watches: Watch,
+  watch: Watch,
+}
+
+const categoryTones = [
+  "bg-sky-50 text-sky-700",
+  "bg-violet-50 text-violet-700",
+  "bg-rose-50 text-rose-700",
+  "bg-emerald-50 text-emerald-700",
+  "bg-amber-50 text-amber-700",
+  "bg-lime-50 text-lime-700",
+  "bg-fuchsia-50 text-fuchsia-700",
+]
+
+export default async function Home() {
+  const [
+    storefrontCategories,
+    popularProducts,
+    featuredProducts,
+    latestProducts,
+  ] = await Promise.all([
+    listStorefrontCategories(),
+    listPopularProducts(12),
+    listFeaturedProducts(6),
+    listStorefrontProducts(12),
+  ])
+  const productGrid = popularProducts.length > 0 ? popularProducts : latestProducts
+  const collectionSections = [
+    {
+      title: "Featured products",
+      caption: "Products selected for storefront promotion",
+      products: featuredProducts.slice(0, 3),
+    },
+    {
+      title: "New arrivals",
+      caption: "Recently added active products",
+      products: latestProducts.slice(0, 3),
+    },
+  ].filter((section) => section.products.length > 0)
+  const sampleProductSlug = productGrid[0]?.slug ?? latestProducts[0]?.slug
+
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
@@ -55,7 +115,7 @@ export default function Home() {
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <Button size="lg" asChild>
-                    <Link href="#popular-products">
+                    <Link href="/products">
                       Shop now
                       <ArrowRight />
                     </Link>
@@ -92,26 +152,44 @@ export default function Home() {
                 Quick paths into the most-used shopping sections.
               </p>
             </div>
-            <Button variant="ghost" asChild>
-              <Link href="/">View all</Link>
-            </Button>
+            {storefrontCategories.length > 0 ? (
+              <Button variant="ghost" asChild>
+                <Link href="/">View all</Link>
+              </Button>
+            ) : null}
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
-            {categories.map((category) => {
-              const Icon = category.icon
+            {storefrontCategories.map((category, index) => {
+              const Icon = getCategoryIcon(category)
+              const tone = categoryTones[index % categoryTones.length]
               return (
                 <Link
-                  key={category.name}
-                  href="/"
+                  key={category.slug}
+                    href={`/products?category=${encodeURIComponent(category.name)}`}
                   className="rounded-lg border bg-card p-4 text-sm transition-colors hover:bg-muted/50"
                 >
-                  <span className={`mb-3 flex size-10 items-center justify-center rounded-lg ${category.tone}`}>
-                    <Icon className="size-5" />
-                  </span>
+                  {category.image ? (
+                    <img
+                      src={category.image}
+                      alt={category.name}
+                      className="mb-3 size-10 rounded-lg object-cover"
+                    />
+                  ) : (
+                    <span className={`mb-3 flex size-10 items-center justify-center rounded-lg ${tone}`}>
+                      <Icon className="size-5" />
+                    </span>
+                  )}
                   <span className="font-medium">{category.name}</span>
                 </Link>
               )
             })}
+            {storefrontCategories.length === 0 ? (
+              <Card className="col-span-full rounded-lg">
+                <CardContent className="text-sm text-muted-foreground">
+                  Categories will appear here after active categories are added.
+                </CardContent>
+              </Card>
+            ) : null}
           </div>
         </section>
 
@@ -125,56 +203,64 @@ export default function Home() {
             <div>
               <h2 className="text-xl font-semibold tracking-tight">Popular products</h2>
               <p className="text-sm text-muted-foreground">
-                Static product cards ready to connect with the backend later.
+                Live products marked popular in the product catalog.
               </p>
             </div>
-            <Button variant="outline" asChild>
-              <Link href="/product/nova-x1-smartphone">Open sample product</Link>
-            </Button>
+            {sampleProductSlug ? (
+              <Button variant="outline" asChild>
+                <Link href={`/product/${sampleProductSlug}`}>Open sample product</Link>
+              </Button>
+            ) : null}
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-            {products.map((product) => (
+            {productGrid.map((product) => (
               <ProductCard key={product.slug} product={product} />
             ))}
+            {productGrid.length === 0 ? (
+              <Card className="col-span-full rounded-lg">
+                <CardContent className="text-sm text-muted-foreground">
+                  Products will appear here after active products are added.
+                </CardContent>
+              </Card>
+            ) : null}
           </div>
         </section>
 
-        <section className="bg-muted/30">
-          <div className="mx-auto grid max-w-7xl gap-4 px-4 py-8 sm:px-6 lg:grid-cols-2 lg:px-8">
-            {featuredCollections.map((collection) => (
-              <div key={collection.title} className="rounded-lg border bg-background p-5">
+        {collectionSections.length > 0 ? (
+          <section className="bg-muted/30">
+            <div className="mx-auto grid max-w-7xl gap-4 px-4 py-8 sm:px-6 lg:grid-cols-2 lg:px-8">
+              {collectionSections.map((collection) => (
+                <div key={collection.title} className="rounded-lg border bg-background p-5">
                 <div className="mb-4 flex items-center justify-between gap-3">
                   <div>
                     <h2 className="text-lg font-semibold">{collection.title}</h2>
                     <p className="text-sm text-muted-foreground">{collection.caption}</p>
                   </div>
                   <Button variant="ghost" size="sm" asChild>
-                    <Link href="/">Explore</Link>
+                    <Link href="/products">Explore</Link>
                   </Button>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-3">
-                  {collection.productSlugs.map((slug) => {
-                    const product = products.find((item) => item.slug === slug) ?? products[0]
-                    return (
-                      <Link
-                        key={slug}
-                        href={`/product/${product.slug}`}
-                        className="rounded-lg border p-3 transition-colors hover:bg-muted/50"
-                      >
-                        <p className="line-clamp-2 min-h-10 text-sm font-medium">
-                          {product.name}
-                        </p>
-                        <p className="mt-2 text-xs text-muted-foreground">
-                          {product.category}
-                        </p>
-                      </Link>
-                    )
-                  })}
+                  {collection.products.map((product) => (
+                    <Link
+                      key={product.slug}
+                      href={`/product/${product.slug}`}
+                      className="rounded-lg border p-3 transition-colors hover:bg-muted/50"
+                    >
+                      <p className="line-clamp-2 min-h-10 text-sm font-medium">
+                        {product.name}
+                      </p>
+                      <p className="mt-2 text-xs text-muted-foreground">
+                        {product.category}
+                      </p>
+                    </Link>
+                  ))}
                 </div>
               </div>
-            ))}
-          </div>
-        </section>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -199,7 +285,15 @@ export default function Home() {
           </div>
         </section>
       </main>
-      <SiteFooter />
+      <SiteFooter categories={storefrontCategories} />
     </div>
   )
+}
+
+function getCategoryIcon(category: StorefrontCategory) {
+  const iconKey = (category.icon ?? category.slug ?? category.name)
+    .toLowerCase()
+    .replace(/[^a-z]/g, "") as keyof typeof categoryIconMap
+
+  return categoryIconMap[iconKey] ?? Package
 }

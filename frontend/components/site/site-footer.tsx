@@ -3,8 +3,18 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
+import {
+  listStorefrontCategories,
+  type StorefrontCategory,
+} from "@/lib/storefront"
 
-export function SiteFooter() {
+type SiteFooterProps = {
+  categories?: StorefrontCategory[]
+}
+
+export async function SiteFooter({ categories }: SiteFooterProps = {}) {
+  const shopCategories = (categories ?? await listStorefrontCategories()).slice(0, 4)
+
   return (
     <footer className="border-t bg-muted/30">
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-[1.3fr_1fr_1fr] lg:px-8">
@@ -23,11 +33,18 @@ export function SiteFooter() {
         </div>
         <div className="grid gap-2 text-sm">
           <h3 className="font-medium">Shop</h3>
-          {["Mobiles", "Electronics", "Fashion", "Home"].map((item) => (
-            <Link key={item} href="/" className="text-muted-foreground hover:text-foreground">
-              {item}
+          {shopCategories.map((category) => (
+            <Link
+              key={category.slug}
+              href={`/?category=${category.slug}`}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              {category.name}
             </Link>
           ))}
+          {shopCategories.length === 0 ? (
+            <span className="text-muted-foreground">Categories coming soon</span>
+          ) : null}
         </div>
         <div className="grid gap-2 text-sm">
           <h3 className="font-medium">Help</h3>
@@ -41,7 +58,7 @@ export function SiteFooter() {
       <Separator />
       <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-4 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
         <span>© 2026 NovaCommerce. All rights reserved.</span>
-        <span>Static storefront preview</span>
+        <span>Storefront preview</span>
       </div>
     </footer>
   )

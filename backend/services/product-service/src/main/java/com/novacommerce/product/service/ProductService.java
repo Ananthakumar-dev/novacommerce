@@ -4,9 +4,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
+import java.math.BigDecimal;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.novacommerce.product.dto.ProductPageResponse;
@@ -51,6 +54,49 @@ public class ProductService {
 
     public ProductResponse getProduct(Long id) {
         return ProductResponse.from(findProduct(id));
+    }
+
+    public List<ProductResponse> listStorefrontProducts(int size) {
+        return productRepository
+                .findByStatusOrderByCreatedAtDesc(ProductStatus.ACTIVE, storefrontPage(size))
+                .stream()
+                .map(ProductResponse::from)
+                .toList();
+    }
+
+    public ProductPageResponse listStorefrontCatalog(String query,
+                                                     String category,
+                                                     String brand,
+                                                     BigDecimal minPrice,
+                                                     BigDecimal maxPrice,
+                                                     Boolean inStock,
+                                                     String sort,
+                                                     int page,
+                                                     int size) {
+        var safePage = Math.max(page, 0);
+        var safeSize = Math.min(Math.max(size, 1), 48);
+        var pageable = PageRequest.of(safePage, safeSize, resolveStorefrontSort(sort));
+        var products = productRepository.findAll(
+                storefrontCatalogSpec(query, category, brand, minPrice, maxPrice, inStock),
+                pageable);
+
+        return toPageResponse(products);
+    }
+
+    public List<ProductResponse> listPopularProducts(int size) {
+        return productRepository
+                .findByStatusAndPopularTrueOrderByUpdatedAtDesc(ProductStatus.ACTIVE, storefrontPage(size))
+                .stream()
+                .map(ProductResponse::from)
+                .toList();
+    }
+
+    public List<ProductResponse> listFeaturedProducts(int size) {
+        return productRepository
+                .findByStatusAndFeaturedTrueOrderByUpdatedAtDesc(ProductStatus.ACTIVE, storefrontPage(size))
+                .stream()
+                .map(ProductResponse::from)
+                .toList();
     }
 
     public ProductResponse createProduct(ProductRequest request) {
@@ -157,6 +203,92 @@ public class ProductService {
     private Product findProduct(Long id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException(id));
+    }
+
+    private PageRequest storefrontPage(int size) {
+        var safeSize = Math.min(Math.max(size, 1), 24);
+        return PageRequest.of(0, safeSize);
+    }
+
+    private ProductPageResponse toPageResponse(Page<Product> products) {
+        var items = products.getContent()
+                .stream()
+                .map(ProductResponse::from)
+                .toList();
+
+        return new ProductPageResponse(items, products.getNumber(), products.getSize(),
+                products.getTotalElements(), products.getTotalPages());
+    }
+
+    private Sort resolveStorefrontSort(String sort) {
+        var normalized = normalizeOptional(sort);
+
+        if ("price-asc".equalsIgnoreCase(normalized)) {
+            return Sort.by(Sort.Direction.ASC, "salePrice").and(Sort.by(Sort.Direction.ASC, "price"));
+        }
+
+        if ("price-desc".equalsIgnoreCase(normalized)) {
+            return Sort.by(Sort.Direction.DESC, "salePrice").and(Sort.by(Sort.Direction.DESC, "price"));
+        }
+
+        if ("name-asc".equalsIgnoreCase(normalized)) {
+            return Sort.by(Sort.Direction.ASC, "name");
+        }
+
+        if ("popular".equalsIgnoreCase(normalized)) {
+            return Sort.by(Sort.Direction.DESC, "popular")
+                    .and(Sort.by(Sort.Direction.DESC, "updatedAt"));
+        }
+
+        return Sort.by(Sort.Direction.DESC, "createdAt");
+    }
+
+    private Specification<Product> storefrontCatalogSpec(String query,
+                                                         String category,
+                                                         String brand,
+                                                         BigDecimal minPrice,
+                                                         BigDecimal maxPrice,
+                                                         Boolean inStock) {
+        return (root, criteriaQuery, criteriaBuilder) -> {
+            var predicates = new java.util.ArrayList<jakarta.persistence.criteria.Predicate>();
+            predicates.add(criteriaBuilder.equal(root.get("status"), ProductStatus.ACTIVE));
+
+            var normalizedQuery = normalizeOptional(query);
+            if (normalizedQuery != null) {
+                var pattern = "%" + normalizedQuery.toLowerCase(Locale.ROOT) + "%";
+                predicates.add(criteriaBuilder.or(
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), pattern),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("sku")), pattern),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("category")), pattern),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("brand")), pattern)));
+            }
+
+            var normalizedCategory = normalizeOptional(category);
+            if (normalizedCategory != null) {
+                predicates.add(criteriaBuilder.equal(criteriaBuilder.lower(root.get("category")),
+                        normalizedCategory.toLowerCase(Locale.ROOT)));
+            }
+
+            var normalizedBrand = normalizeOptional(brand);
+            if (normalizedBrand != null) {
+                predicates.add(criteriaBuilder.equal(criteriaBuilder.lower(root.get("brand")),
+                        normalizedBrand.toLowerCase(Locale.ROOT)));
+            }
+
+            if (minPrice != null) {
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("price"), minPrice));
+            }
+
+            if (maxPrice != null) {
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("price"), maxPrice));
+            }
+
+            if (Boolean.TRUE.equals(inStock)) {
+                predicates.add(criteriaBuilder.greaterThan(root.get("stockQuantity"), 0));
+            }
+
+            return criteriaBuilder.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0]));
+        };
     }
 
     private void validateOptions(ProductRequest request) {

@@ -62,33 +62,37 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <div className="hidden min-w-0 flex-1 items-center gap-2 rounded-lg border bg-muted/30 p-1 md:flex">
-          <Select defaultValue="all">
+        <form
+          action="/products"
+          className="hidden min-w-0 flex-1 items-center gap-2 rounded-lg border bg-muted/30 p-1 md:flex"
+        >
+          <Select defaultValue="all" name="category">
             <SelectTrigger className="w-36 border-0 bg-transparent shadow-none">
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              <SelectItem value="mobiles">Mobiles</SelectItem>
+              <SelectItem value="">All</SelectItem>
+              <SelectItem value="Mobiles">Mobiles</SelectItem>
               <SelectItem value="fashion">Fashion</SelectItem>
-              <SelectItem value="electronics">Electronics</SelectItem>
-              <SelectItem value="home">Home</SelectItem>
+              <SelectItem value="Electronics">Electronics</SelectItem>
+              <SelectItem value="Home">Home</SelectItem>
             </SelectContent>
           </Select>
           <div className="relative flex-1">
             <Search className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
+              name="q"
               placeholder="Search for products, brands and more"
               className="border-0 bg-transparent pl-8 shadow-none focus-visible:ring-0"
             />
           </div>
-          <Button>Search</Button>
-        </div>
+          <Button type="submit">Search</Button>
+        </form>
 
         <nav className="hidden items-center gap-1 lg:flex">
           {navItems.slice(0, 3).map((item) => (
             <Button key={item} variant="ghost" asChild>
-              <Link href="/">{item}</Link>
+                <Link href={item === "Categories" ? "/products" : "/"}>{item}</Link>
             </Button>
           ))}
         </nav>
@@ -115,10 +119,10 @@ export function SiteHeader() {
         </div>
       </div>
       <div className="border-t px-4 py-2 md:hidden">
-        <div className="relative mx-auto max-w-7xl">
+        <form action="/products" className="relative mx-auto max-w-7xl">
           <Search className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="Search products" className="pl-8" />
-        </div>
+          <Input name="q" placeholder="Search products" className="pl-8" />
+        </form>
       </div>
     </header>
   )
