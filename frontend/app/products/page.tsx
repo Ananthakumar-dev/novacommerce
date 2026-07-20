@@ -82,7 +82,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
   return (
     <div className="min-h-screen bg-background">
-      <SiteHeader />
+      <SiteHeader categories={categories} />
       <main>
         <section className="border-b bg-muted/30">
           <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">

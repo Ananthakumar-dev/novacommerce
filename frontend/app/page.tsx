@@ -96,7 +96,7 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SiteHeader />
+      <SiteHeader categories={storefrontCategories} />
       <main>
         <section className="border-b bg-muted/30">
           <div className="mx-auto grid max-w-7xl gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[1.5fr_0.8fr] lg:px-8">

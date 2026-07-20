@@ -63,6 +63,7 @@ import { ProductCard } from "@/components/site/product-card"
 import { ProductVisual } from "@/components/site/product-visual"
 import { SiteFooter } from "@/components/site/site-footer"
 import { SiteHeader } from "@/components/site/site-header"
+import { listStorefrontCategories } from "@/lib/storefront"
 
 type ProductPageProps = {
   params: Promise<{ slug: string }>
@@ -75,11 +76,12 @@ export function generateStaticParams() {
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params
   const product = getProductBySlug(slug)
+  const categories = await listStorefrontCategories()
   const relatedProducts = products.filter((item) => item.slug !== product.slug).slice(0, 4)
 
   return (
     <div className="min-h-screen bg-background">
-      <SiteHeader />
+      <SiteHeader categories={categories} />
       <main>
         <section className="border-b bg-muted/30">
           <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">

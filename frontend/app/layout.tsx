@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { LoaderProvider } from "@/components/site/loader-provider";
 
 export const metadata: Metadata = {
   title: "NovaCommerce",
@@ -15,7 +16,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col">
-        <TooltipProvider>{children}</TooltipProvider>
+        <LoaderProvider>
+          <TooltipProvider>{children}</TooltipProvider>
+        </LoaderProvider>
       </body>
     </html>
   );
