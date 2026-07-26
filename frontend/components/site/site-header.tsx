@@ -27,15 +27,30 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { type StorefrontCategory } from "@/lib/storefront"
-
-const navItems = ["Deals", "Categories", "Orders", "Support"]
+import { UserMenuPopover } from "@/components/site/user-menu-popover"
+import { useCustomerAuth } from "@/components/providers/customer-auth-provider"
+import type { StorefrontCategory } from "@/lib/storefront"
 
 export interface SiteHeaderProps {
   categories?: StorefrontCategory[]
 }
 
 export function SiteHeader({ categories = [] }: SiteHeaderProps) {
+  const { user } = useCustomerAuth()
+
+  const dynamicNavItems = user
+    ? [
+        { label: "Deals", href: "/" },
+        { label: "Categories", href: "/products" },
+        { label: "Orders", href: "/orders" },
+        { label: "Account", href: "/account" },
+      ]
+    : [
+        { label: "Deals", href: "/" },
+        { label: "Categories", href: "/products" },
+        { label: "Support", href: "/" },
+      ]
+
   return (
     <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:px-6 lg:px-8">
@@ -50,16 +65,32 @@ export function SiteHeader({ categories = [] }: SiteHeaderProps) {
             <SheetHeader>
               <SheetTitle>NovaCommerce</SheetTitle>
             </SheetHeader>
-            <nav className="grid gap-1 px-4">
-              {navItems.map((item) => (
+            <nav className="grid gap-1 px-4 mt-4">
+              {dynamicNavItems.map((item) => (
                 <Link
-                  key={item}
-                  href="/"
+                  key={item.label}
+                  href={item.href}
                   className="rounded-lg px-3 py-2 text-sm font-medium hover:bg-muted"
                 >
-                  {item}
+                  {item.label}
                 </Link>
               ))}
+              {!user && (
+                <div className="pt-4 border-t space-y-2">
+                  <Link
+                    href="/login"
+                    className="block rounded-lg px-3 py-2 text-sm font-medium text-sky-700 hover:bg-sky-50 dark:text-sky-400"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="block rounded-lg px-3 py-2 text-sm font-medium text-sky-700 hover:bg-sky-50 dark:text-sky-400"
+                  >
+                    Create Account
+                  </Link>
+                </div>
+              )}
             </nav>
           </SheetContent>
         </Sheet>
@@ -75,23 +106,15 @@ export function SiteHeader({ categories = [] }: SiteHeaderProps) {
         </Suspense>
 
         <nav className="hidden items-center gap-1 lg:flex">
-          {navItems.slice(0, 3).map((item) => (
-            <Button key={item} variant="ghost" asChild>
-                <Link href={item === "Categories" ? "/products" : "/"}>{item}</Link>
+          {dynamicNavItems.map((item) => (
+            <Button key={item.label} variant="ghost" asChild>
+              <Link href={item.href}>{item.label}</Link>
             </Button>
           ))}
         </nav>
 
         <div className="ml-auto flex items-center gap-1">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <UserRound />
-                <span className="sr-only">Account</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Account</TooltipContent>
-          </Tooltip>
+          <UserMenuPopover />
           <Tooltip>
             <TooltipTrigger asChild>
               <Button variant="ghost" size="icon">

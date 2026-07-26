@@ -1,7 +1,8 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { authHeaders, getApiGatewayUrl, requireAdminToken } from "@/lib/auth";
+import { authHeaders, requireAdminToken } from "@/lib/auth";
+import { getApiGatewayUrl } from "@/lib/config";
 
 export type StockStatus = "IN_STOCK" | "LOW_STOCK" | "OUT_OF_STOCK";
 export type StockMovementType = "ADD" | "REMOVE" | "SET";

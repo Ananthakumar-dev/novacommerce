@@ -1,7 +1,8 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { authHeaders, getApiGatewayUrl, requireAdminToken } from "@/lib/auth";
+import { authHeaders, requireAdminToken } from "@/lib/auth";
+import { getApiGatewayUrl } from "@/lib/config";
 
 export type ProductStatus = "DRAFT" | "ACTIVE" | "INACTIVE";
 

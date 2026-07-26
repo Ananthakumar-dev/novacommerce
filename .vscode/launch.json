@@ -1,0 +1,28 @@
+{
+  "configurations": [
+    {
+      "type": "java",
+      "name": "ProductServiceApplication",
+      "request": "launch",
+      "mainClass": "com.novacommerce.product.ProductServiceApplication",
+      "projectName": "product-service"
+    },
+    {
+      "type": "java",
+      "name": "ApiGatewayApplication",
+      "request": "launch",
+      "mainClass": "com.novacommerce.gateway.ApiGatewayApplication",
+      "projectName": "api-gateway"
+    },
+    {
+      "type": "java",
+      "name": "Spring Boot-AuthServiceApplication<auth-service>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "com.novacommerce.auth.AuthServiceApplication",
+      "projectName": "auth-service",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env"
+    }
+  ]
+}

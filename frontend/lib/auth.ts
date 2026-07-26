@@ -18,12 +18,10 @@ export type AdminProfile = {
   role: string
 }
 
+import { getApiGatewayUrl } from "@/lib/config"
+
 export function getAuthServiceUrl() {
   return getApiGatewayUrl()
-}
-
-export function getApiGatewayUrl() {
-  return process.env.API_GATEWAY_URL ?? "http://localhost:8080"
 }
 
 export async function setAdminTokenCookie(token: string) {

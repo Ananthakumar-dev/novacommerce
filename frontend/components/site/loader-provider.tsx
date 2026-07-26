@@ -1,6 +1,6 @@
 "use client"
 
-import React, { createContext, useContext, useEffect, useState } from "react"
+import React, { createContext, useContext, useEffect, useState, useCallback, Suspense } from "react"
 import { usePathname, useSearchParams } from "next/navigation"
 import { NovaLoader } from "@/components/ui/nova-loader"
 
@@ -13,30 +13,36 @@ interface LoaderContextType {
 
 const LoaderContext = createContext<LoaderContextType | undefined>(undefined)
 
-export function LoaderProvider({ children }: { children: React.ReactNode }) {
-  const [isLoading, setIsLoading] = useState(false)
-  const [message, setMessage] = useState("")
-  
+function RouteChangeListener({ onRouteChange }: { onRouteChange: () => void }) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  const showLoader = (msg: string = "") => {
+  useEffect(() => {
+    onRouteChange()
+  }, [pathname, searchParams, onRouteChange])
+
+  return null
+}
+
+export function LoaderProvider({ children }: { children: React.ReactNode }) {
+  const [isLoading, setIsLoading] = useState(false)
+  const [message, setMessage] = useState("")
+
+  const showLoader = useCallback((msg: string = "") => {
     setMessage(msg)
     setIsLoading(true)
-  }
+  }, [])
 
-  const hideLoader = () => {
+  const hideLoader = useCallback(() => {
     setIsLoading(false)
     setMessage("")
-  }
-
-  // Automatically hide the loader when client-side route changes complete
-  useEffect(() => {
-    hideLoader()
-  }, [pathname, searchParams])
+  }, [])
 
   return (
     <LoaderContext.Provider value={{ isLoading, message, showLoader, hideLoader }}>
+      <Suspense fallback={null}>
+        <RouteChangeListener onRouteChange={hideLoader} />
+      </Suspense>
       {children}
       {isLoading && <NovaLoader overlay={true} message={message} />}
     </LoaderContext.Provider>

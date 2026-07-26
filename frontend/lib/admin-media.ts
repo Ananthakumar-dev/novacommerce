@@ -1,4 +1,5 @@
-import { getApiGatewayUrl, requireAdminToken } from "@/lib/auth"
+import { requireAdminToken } from "@/lib/auth"
+import { getApiGatewayUrl } from "@/lib/config"
 
 export async function uploadAdminImage(file: FormDataEntryValue | null) {
   if (!(file instanceof File) || file.size === 0) {

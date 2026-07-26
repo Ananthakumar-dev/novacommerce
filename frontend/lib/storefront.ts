@@ -1,4 +1,4 @@
-import { getApiGatewayUrl } from "@/lib/auth"
+import { getApiGatewayUrl } from "@/lib/config"
 
 export type StorefrontCategory = {
   id: number

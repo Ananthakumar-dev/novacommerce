@@ -1,7 +1,8 @@
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 
-import { getApiGatewayUrl, requireAdminToken } from "@/lib/auth"
+import { requireAdminToken } from "@/lib/auth"
+import { getApiGatewayUrl } from "@/lib/config"
 
 export type AdminUserRole = "ADMIN" | "CUSTOMER" | "MERCHANT"
 
