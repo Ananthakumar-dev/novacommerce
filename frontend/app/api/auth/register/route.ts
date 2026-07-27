@@ -3,7 +3,7 @@ import { registerCustomerUser, setCustomerTokenCookie } from "@/lib/customer-aut
 
 export async function POST(request: Request) {
   try {
-    const { fullName, email, password } = await request.json()
+        const { fullName, email, password, role } = await request.json()
 
     if (!fullName || !email || !password) {
       return NextResponse.json(
@@ -12,7 +12,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const result = await registerCustomerUser(fullName, email, password)
+    const result = await registerCustomerUser(fullName, email, password, role || "CUSTOMER")
 
     if (!result.ok) {
       return NextResponse.json(

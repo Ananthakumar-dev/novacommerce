@@ -2,7 +2,7 @@
 
 import React, { useState } from "react"
 import Link from "next/link"
-import { LogIn, UserPlus, User, ShoppingBag, LogOut, ShieldCheck, ChevronRight } from "lucide-react"
+import { LogIn, UserPlus, User, ShoppingBag, LogOut, ShieldCheck, ChevronRight, LayoutDashboard } from "lucide-react"
 
 import { useCustomerAuth } from "@/components/providers/customer-auth-provider"
 import { Button } from "@/components/ui/button"
@@ -14,7 +14,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-
+ 
 export function UserMenuPopover() {
   const { user, isLoading, logout } = useCustomerAuth()
   const [open, setOpen] = useState(false)
@@ -76,6 +76,20 @@ export function UserMenuPopover() {
 
             {/* Menu Options */}
             <div className="p-2 space-y-0.5">
+              {(user.role === "CUSTOMER" || user.role === "MERCHANT") && (
+                <Link
+                  href="/dashboard"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg hover:bg-accent text-foreground transition-colors group"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <LayoutDashboard className="size-4 text-sky-600 dark:text-sky-400 group-hover:scale-110 transition-transform" />
+                    <span>My Dashboard</span>
+                  </div>
+                  <ChevronRight className="size-4 text-muted-foreground/60 group-hover:translate-x-0.5 transition-transform" />
+                </Link>
+              )}
+
               <Link
                 href="/account"
                 onClick={() => setOpen(false)}

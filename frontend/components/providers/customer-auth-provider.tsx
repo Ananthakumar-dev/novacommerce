@@ -13,8 +13,8 @@ export type CustomerUser = {
 type CustomerAuthContextType = {
   user: CustomerUser | null
   isLoading: boolean
-  login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>
-  register: (fullName: string, email: string, password: string) => Promise<{ success: boolean; message?: string }>
+  login: (email: string, password: string) => Promise<{ success: boolean; message?: string; user?: CustomerUser }>
+  register: (fullName: string, email: string, password: string, role?: string) => Promise<{ success: boolean; message?: string; user?: CustomerUser }>
   logout: () => Promise<void>
   refreshUser: () => Promise<void>
 }
@@ -62,18 +62,18 @@ export function CustomerAuthProvider({ children }: { children: React.ReactNode }
 
       setUser(data.user)
       router.refresh()
-      return { success: true }
+      return { success: true, user: data.user }
     } catch {
       return { success: false, message: "Network error occurred during login." }
     }
   }
 
-  const register = async (fullName: string, email: string, password: string) => {
+  const register = async (fullName: string, email: string, password: string, role: string = "CUSTOMER") => {
     try {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fullName, email, password }),
+        body: JSON.stringify({ fullName, email, password, role }),
       })
 
       const data = await res.json()
@@ -84,7 +84,7 @@ export function CustomerAuthProvider({ children }: { children: React.ReactNode }
 
       setUser(data.user)
       router.refresh()
-      return { success: true }
+      return { success: true, user: data.user }
     } catch {
       return { success: false, message: "Network error occurred during registration." }
     }

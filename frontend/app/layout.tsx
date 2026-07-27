@@ -3,6 +3,7 @@ import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LoaderProvider } from "@/components/site/loader-provider";
 import { CustomerAuthProvider } from "@/components/providers/customer-auth-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "NovaCommerce",
@@ -19,7 +20,10 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <LoaderProvider>
           <CustomerAuthProvider>
-            <TooltipProvider>{children}</TooltipProvider>
+            <TooltipProvider>
+              {children}
+              <Toaster />
+            </TooltipProvider>
           </CustomerAuthProvider>
         </LoaderProvider>
       </body>

@@ -4,6 +4,7 @@ import React, { useState, Suspense } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Eye, EyeOff, LogIn, Lock, Mail, ArrowLeft, Loader2 } from "lucide-react"
+import { toast } from "sonner"
 
 import { useCustomerAuth } from "@/components/providers/customer-auth-provider"
 import { Button } from "@/components/ui/button"
@@ -16,7 +17,7 @@ import { SiteFooter } from "@/components/site/site-footer"
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirectUrl = searchParams.get("redirect") || "/"
+  const redirectUrl = searchParams.get("redirect") || "/dashboard"
 
   const { login } = useCustomerAuth()
 
@@ -42,6 +43,9 @@ function LoginForm() {
         setError(result.message || "Invalid credentials. Please try again.")
         setLoading(false)
       } else {
+        toast.success(`Welcome back, ${result.user?.fullName}!`, {
+          description: `Logged in as ${result.user?.role?.toLowerCase()}.`,
+        })
         router.push(redirectUrl)
       }
     } catch {

@@ -64,7 +64,7 @@ export async function loginCustomerUser(email: string, password: string) {
   }
 }
 
-export async function registerCustomerUser(fullName: string, email: string, password: string) {
+export async function registerCustomerUser(fullName: string, email: string, password: string, role: string = "CUSTOMER") {
   const response = await fetch(`${getApiGatewayUrl()}/api/auth/register`, {
     method: "POST",
     headers: {
@@ -74,7 +74,7 @@ export async function registerCustomerUser(fullName: string, email: string, pass
       fullName,
       email,
       password,
-      role: "CUSTOMER",
+      role,
     }),
     cache: "no-store",
   })

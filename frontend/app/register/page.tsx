@@ -4,6 +4,7 @@ import React, { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Eye, EyeOff, UserPlus, Lock, Mail, User, ArrowLeft, Loader2 } from "lucide-react"
+import { toast } from "sonner"
 
 import { useCustomerAuth } from "@/components/providers/customer-auth-provider"
 import { Button } from "@/components/ui/button"
@@ -12,6 +13,13 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { SiteHeader } from "@/components/site/site-header"
 import { SiteFooter } from "@/components/site/site-footer"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -19,6 +27,7 @@ export default function RegisterPage() {
 
   const [fullName, setFullName] = useState("")
   const [email, setEmail] = useState("")
+  const [role, setRole] = useState("CUSTOMER")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -46,12 +55,15 @@ export default function RegisterPage() {
     setLoading(true)
 
     try {
-      const result = await register(fullName, email, password)
+      const result = await register(fullName, email, password, role)
       if (!result.success) {
         setError(result.message || "Registration failed. Please try again.")
         setLoading(false)
       } else {
-        router.push("/")
+        toast.success(`Account created successfully!`, {
+          description: `Welcome to NovaCommerce, ${result.user?.fullName}! Registered as a ${result.user?.role?.toLowerCase()}.`,
+        })
+        router.push("/dashboard")
       }
     } catch {
       setError("An unexpected error occurred. Please try again.")
@@ -122,6 +134,19 @@ export default function RegisterPage() {
                       required
                     />
                   </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="role">Register As</Label>
+                  <Select value={role} onValueChange={setRole}>
+                    <SelectTrigger id="role" className="w-full">
+                      <SelectValue placeholder="Select account type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="CUSTOMER">Customer (Buy Products)</SelectItem>
+                      <SelectItem value="MERCHANT">Merchant / Seller (Manage Products)</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="space-y-2">

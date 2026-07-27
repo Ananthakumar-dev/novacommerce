@@ -1,3 +1,6 @@
+"use client"
+
+import React, { useEffect, useState } from "react"
 import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
@@ -12,8 +15,34 @@ type SiteFooterProps = {
   categories?: StorefrontCategory[]
 }
 
-export async function SiteFooter({ categories }: SiteFooterProps = {}) {
-  const shopCategories = (categories ?? await listStorefrontCategories()).slice(0, 4)
+export function SiteFooter({ categories }: SiteFooterProps = {}) {
+  const [shopCategories, setShopCategories] = useState<StorefrontCategory[]>(categories ?? [])
+
+  useEffect(() => {
+    if (categories) {
+      setShopCategories(categories)
+      return
+    }
+
+    let active = true
+    async function loadCategories() {
+      try {
+        const data = await listStorefrontCategories()
+        if (active) {
+          setShopCategories(data)
+        }
+      } catch (err) {
+        console.error("Error loading categories in footer:", err)
+      }
+    }
+    loadCategories()
+
+    return () => {
+      active = false
+    }
+  }, [categories])
+
+  const displayedCategories = shopCategories.slice(0, 4)
 
   return (
     <footer className="border-t bg-muted/30">
@@ -33,7 +62,7 @@ export async function SiteFooter({ categories }: SiteFooterProps = {}) {
         </div>
         <div className="grid gap-2 text-sm">
           <h3 className="font-medium">Shop</h3>
-          {shopCategories.map((category) => (
+          {displayedCategories.map((category) => (
             <Link
               key={category.slug}
               href={`/?category=${category.slug}`}
@@ -42,7 +71,7 @@ export async function SiteFooter({ categories }: SiteFooterProps = {}) {
               {category.name}
             </Link>
           ))}
-          {shopCategories.length === 0 ? (
+          {displayedCategories.length === 0 ? (
             <span className="text-muted-foreground">Categories coming soon</span>
           ) : null}
         </div>
