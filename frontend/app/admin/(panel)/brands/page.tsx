@@ -4,7 +4,7 @@ import { Tag, Plus } from "lucide-react"
 
 import { EntityMark } from "@/components/admin/icon-picker"
 import { listAdminBrands } from "@/lib/admin-brands"
-import { mediaUrl } from "@/lib/admin-media"
+import { mediaUrl } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {

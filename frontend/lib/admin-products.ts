@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { authHeaders, requireAdminToken } from "@/lib/auth";
 import { getApiGatewayUrl } from "@/lib/config";
+import { uploadAdminImage } from "@/lib/admin-media";
 
 export type ProductStatus = "DRAFT" | "ACTIVE" | "INACTIVE";
 
@@ -124,10 +125,16 @@ export async function getProductOptions() {
 export async function createAdminProduct(formData: FormData) {
   const token = await requireAdminToken();
   if (!token) redirect("/admin");
+  const payload = await resolveProductPayload(formData);
+
+  if (!payload.ok) {
+    return payload;
+  }
+
   const response = await fetch(`${getApiGatewayUrl()}/api/admin/products`, {
     method: "POST",
     headers: authHeaders(token),
-    body: JSON.stringify(productPayload(formData)),
+    body: JSON.stringify(payload.data),
     cache: "no-store",
   });
 
@@ -145,12 +152,18 @@ export async function createAdminProduct(formData: FormData) {
 export async function updateAdminProduct(id: string, formData: FormData) {
   const token = await requireAdminToken();
   if (!token) redirect("/admin");
+  const payload = await resolveProductPayload(formData);
+
+  if (!payload.ok) {
+    return payload;
+  }
+
   const response = await fetch(
     `${getApiGatewayUrl()}/api/admin/products/${id}`,
     {
       method: "PUT",
       headers: authHeaders(token),
-      body: JSON.stringify(productPayload(formData)),
+      body: JSON.stringify(payload.data),
       cache: "no-store",
     },
   );
@@ -205,7 +218,9 @@ export async function updateAdminProductPopular(id: string, popular: boolean) {
   };
 }
 
-function productPayload(formData: FormData) {
+async function productPayload(formData: FormData) {
+  const uploadedImageUrl = await uploadAdminImage(formData.get("imageFile"));
+
   return {
     name: textValue(formData, "name"),
     slug: textValue(formData, "slug"),
@@ -219,12 +234,26 @@ function productPayload(formData: FormData) {
     status: textValue(formData, "status") as ProductStatus,
     category: textValue(formData, "category"),
     brand: textValue(formData, "brand"),
-    imageUrl: textValue(formData, "imageUrl"),
+    imageUrl: uploadedImageUrl ?? textValue(formData, "imageUrl"),
     featured: formData.get("featured") === "on",
     popular: formData.get("popular") === "on",
     metaTitle: textValue(formData, "metaTitle"),
     metaDescription: textValue(formData, "metaDescription"),
   };
+}
+
+async function resolveProductPayload(formData: FormData) {
+  try {
+    return {
+      ok: true as const,
+      data: await productPayload(formData),
+    };
+  } catch (error) {
+    return {
+      ok: false as const,
+      message: error instanceof Error ? error.message : "Unable to upload image.",
+    };
+  }
 }
 
 function textValue(formData: FormData, key: string) {

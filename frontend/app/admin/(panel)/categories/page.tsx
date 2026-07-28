@@ -4,7 +4,7 @@ import { FolderTree, Plus } from "lucide-react"
 
 import { EntityMark } from "@/components/admin/icon-picker"
 import { listAdminCategories } from "@/lib/admin-categories"
-import { mediaUrl } from "@/lib/admin-media"
+import { mediaUrl } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {

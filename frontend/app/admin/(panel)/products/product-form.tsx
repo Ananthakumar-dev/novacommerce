@@ -28,7 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { cn } from "@/lib/utils"
+import { cn, mediaUrl } from "@/lib/utils"
 
 type ProductFormProps = {
   action: (
@@ -195,14 +195,26 @@ export function ProductForm({ action, options, product }: ProductFormProps) {
           </div>
 
           <div className="grid gap-5 sm:grid-cols-[1fr_220px]">
-            <Field label="Image URL" htmlFor="imageUrl">
+            <Field label="Product image" htmlFor="imageFile">
+              <input type="hidden" name="imageUrl" value={product?.imageUrl ?? ""} />
               <Input
-                id="imageUrl"
-                name="imageUrl"
-                type="url"
-                defaultValue={product?.imageUrl ?? ""}
-                placeholder="https://example.com/product.jpg"
+                id="imageFile"
+                name="imageFile"
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/svg+xml"
               />
+              {product?.imageUrl ? (
+                <div className="mt-2 space-y-1.5">
+                  <p className="text-xs text-muted-foreground">
+                    Current image saved:
+                  </p>
+                  <img
+                    src={mediaUrl(product.imageUrl) ?? ""}
+                    alt={product.name}
+                    className="h-24 w-24 rounded-lg object-cover border bg-muted/20"
+                  />
+                </div>
+              ) : null}
             </Field>
             <Field label="Status" htmlFor="status">
               <Select name="status" defaultValue={product?.status ?? "DRAFT"}>

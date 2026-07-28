@@ -1,6 +1,6 @@
 import { PackageCheck } from "lucide-react"
 
-import { cn } from "@/lib/utils"
+import { cn, mediaUrl } from "@/lib/utils"
 
 type ProductVisualProps = {
   name: string
@@ -28,7 +28,7 @@ export function ProductVisual({
     >
       {imageUrl ? (
         <img
-          src={imageUrl}
+          src={mediaUrl(imageUrl) ?? ""}
           alt={name}
           className="size-full object-cover"
         />

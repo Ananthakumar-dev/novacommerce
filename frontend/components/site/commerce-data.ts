@@ -31,6 +31,7 @@ export const products = [
     badge: "Best seller",
     imageTone: "from-sky-100 via-white to-indigo-100",
     accent: "bg-sky-600",
+    imageUrl: null as string | null,
     description:
       "A slim 5G phone with a vivid display, dependable battery life, and camera tuning made for everyday photos.",
   },

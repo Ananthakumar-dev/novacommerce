@@ -111,6 +111,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <div className="space-y-3">
             <ProductVisual
               name={product.name}
+              imageUrl={product.imageUrl}
               imageTone={product.imageTone}
               accent={product.accent}
               className="rounded-lg border"

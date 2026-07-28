@@ -31,18 +31,6 @@ export async function uploadAdminImage(file: FormDataEntryValue | null) {
   return data.url
 }
 
-export function mediaUrl(url?: string | null) {
-  if (!url) {
-    return null
-  }
-
-  if (url.startsWith("http://") || url.startsWith("https://")) {
-    return url
-  }
-
-  return `${getApiGatewayUrl()}${url}`
-}
-
 async function readMediaError(response: Response) {
   try {
     const data = (await response.json()) as { message?: string }
