@@ -1,6 +1,7 @@
 package com.novacommerce.product.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,6 +11,8 @@ import com.novacommerce.product.entity.Product;
 import com.novacommerce.product.enums.ProductStatus;
 
 public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
+    Optional<Product> findBySlug(String slug);
+
     List<Product> findByStatusOrderByCreatedAtDesc(ProductStatus status, Pageable pageable);
 
     List<Product> findByStatusAndPopularTrueOrderByUpdatedAtDesc(ProductStatus status, Pageable pageable);

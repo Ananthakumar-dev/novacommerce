@@ -301,6 +301,12 @@ public class ProductService {
         }
     }
 
+    public ProductResponse getProductBySlug(String slug) {
+        var product = productRepository.findBySlug(slug)
+                .orElseThrow(() -> new ProductNotFoundException("Product not found with slug: " + slug));
+        return ProductResponse.from(product);
+    }
+
     private String resolveSlug(String slug, String name) {
         var source = normalizeOptional(slug);
 

@@ -60,10 +60,11 @@ import {
   products,
 } from "@/components/site/commerce-data"
 import { ProductCard } from "@/components/site/product-card"
+import { ProductActions } from "@/components/site/product-actions"
 import { ProductVisual } from "@/components/site/product-visual"
 import { SiteFooter } from "@/components/site/site-footer"
 import { SiteHeader } from "@/components/site/site-header"
-import { listStorefrontCategories } from "@/lib/storefront"
+import { listStorefrontCategories, getStorefrontProductBySlug } from "@/lib/storefront"
 
 type ProductPageProps = {
   params: Promise<{ slug: string }>
@@ -75,8 +76,18 @@ export function generateStaticParams() {
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params
-  const product = getProductBySlug(slug)
+  const dbProduct = await getStorefrontProductBySlug(slug)
+  const mockProduct = getProductBySlug(slug)
   const categories = await listStorefrontCategories()
+
+  const product = {
+    ...mockProduct,
+    id: dbProduct?.id,
+    price: dbProduct?.price ?? mockProduct.price,
+    salePrice: dbProduct?.salePrice ?? mockProduct.salePrice,
+    stockQuantity: dbProduct?.stockQuantity ?? 10,
+  }
+
   const relatedProducts = products.filter((item) => item.slug !== product.slug).slice(0, 4)
 
   return (
@@ -182,47 +193,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               </p>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-3">
-                <Label>Color</Label>
-                <RadioGroup defaultValue="graphite" className="flex flex-wrap gap-2">
-                  {["Graphite", "Silver", "Ocean"].map((color) => (
-                    <Label
-                      key={color}
-                      className="flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm"
-                    >
-                      <RadioGroupItem value={color.toLowerCase()} />
-                      {color}
-                    </Label>
-                  ))}
-                </RadioGroup>
-              </div>
-              <div className="space-y-3">
-                <Label>Quantity</Label>
-                <div className="flex items-center gap-2">
-                  <Button variant="outline" size="icon">
-                    <Minus />
-                    <span className="sr-only">Decrease quantity</span>
-                  </Button>
-                  <Input className="w-16 text-center" value="1" readOnly />
-                  <Button variant="outline" size="icon">
-                    <Plus />
-                    <span className="sr-only">Increase quantity</span>
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid gap-2 sm:grid-cols-2">
-              <Button size="lg">
-                <ShoppingCart />
-                Add to cart
-              </Button>
-              <Button size="lg" variant="secondary">
-                <Zap />
-                Buy now
-              </Button>
-            </div>
+            <ProductActions productId={product.id!} productName={product.name} productSlug={product.slug} />
           </div>
 
           <aside className="space-y-4">

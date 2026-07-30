@@ -113,6 +113,13 @@ export async function listStorefrontProductCatalog(
   )
 }
 
+export async function getStorefrontProductBySlug(slug: string) {
+  return storefrontFetch<StorefrontProduct | null>(
+    `/api/storefront/products/slug/${slug}`,
+    null
+  )
+}
+
 async function storefrontFetch<T>(path: string, fallback: T) {
   try {
     const response = await fetch(`${getApiGatewayUrl()}${path}`, {

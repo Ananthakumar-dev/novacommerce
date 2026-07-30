@@ -30,6 +30,7 @@ import {
 import { UserMenuPopover } from "@/components/site/user-menu-popover"
 import { useCustomerAuth } from "@/components/providers/customer-auth-provider"
 import type { StorefrontCategory } from "@/lib/storefront"
+import { useCart } from "@/components/providers/cart-provider"
 
 export interface SiteHeaderProps {
   categories?: StorefrontCategory[]
@@ -37,6 +38,8 @@ export interface SiteHeaderProps {
 
 export function SiteHeader({ categories = [] }: SiteHeaderProps) {
   const { user } = useCustomerAuth()
+  const { cart } = useCart()
+  const cartItemsCount = cart?.totalItems ?? 0
 
   const dynamicNavItems = user
     ? [
@@ -117,9 +120,16 @@ export function SiteHeader({ categories = [] }: SiteHeaderProps) {
           <UserMenuPopover />
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <ShoppingCart />
-                <span className="sr-only">Cart</span>
+              <Button variant="ghost" size="icon" className="relative" asChild>
+                <Link href="/cart">
+                  <ShoppingCart className="size-5" />
+                  <span className="sr-only">Cart</span>
+                  {cartItemsCount > 0 && (
+                    <span className="absolute -top-1 -right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-sky-700 text-[10px] font-bold text-white ring-2 ring-background animate-in zoom-in duration-200">
+                      {cartItemsCount}
+                    </span>
+                  )}
+                </Link>
               </Button>
             </TooltipTrigger>
             <TooltipContent>Cart</TooltipContent>
