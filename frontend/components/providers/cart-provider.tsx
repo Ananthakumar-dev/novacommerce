@@ -29,6 +29,7 @@ type CartContextType = {
   addToCart: (productId: number, quantity: number, color: string | null) => Promise<boolean>
   updateQuantity: (itemId: number, quantity: number) => Promise<boolean>
   removeItem: (itemId: number) => Promise<boolean>
+  clearCart: () => Promise<boolean>
   fetchCart: () => Promise<void>
 }
 
@@ -141,8 +142,29 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const clearCart = async () => {
+    if (!user) return false
+
+    try {
+      const res = await fetch("/api/cart", {
+        method: "DELETE",
+      })
+
+      if (!res.ok) {
+        toast.error("Failed to clear cart.")
+        return false
+      }
+
+      setCart(null)
+      return true
+    } catch {
+      toast.error("Network error occurred. Please try again.")
+      return false
+    }
+  }
+
   return (
-    <CartContext.Provider value={{ cart, isLoading, addToCart, updateQuantity, removeItem, fetchCart }}>
+    <CartContext.Provider value={{ cart, isLoading, addToCart, updateQuantity, removeItem, clearCart, fetchCart }}>
       {children}
     </CartContext.Provider>
   )

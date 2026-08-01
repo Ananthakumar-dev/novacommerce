@@ -3,7 +3,7 @@
 import React from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { User, Mail, Shield, ShoppingBag, LogOut, ArrowLeft, Loader2, CheckCircle2 } from "lucide-react"
+import { User, Mail, Shield, ShoppingBag, LogOut, ArrowLeft, Loader2, CheckCircle2, MapPin } from "lucide-react"
 
 import { useCustomerAuth } from "@/components/providers/customer-auth-provider"
 import { Button } from "@/components/ui/button"
@@ -132,7 +132,7 @@ export default function AccountPage() {
             <Separator />
 
             {/* Profile Grid */}
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               <Card className="border-border/40 bg-muted/30">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-sm font-semibold flex items-center gap-2">
@@ -178,6 +178,25 @@ export default function AccountPage() {
                     <span className="text-muted-foreground">Backend Service</span>
                     <span className="font-medium text-sky-700">Spring Boot Auth Service</span>
                   </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-border/40 bg-muted/30 flex flex-col justify-between">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                    <MapPin className="size-4 text-sky-700" />
+                    Address Book
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm flex flex-col justify-between flex-1">
+                  <p className="text-muted-foreground text-xs leading-relaxed">
+                    Manage your shipping and billing addresses for faster and smoother checkout experiences.
+                  </p>
+                  <Button asChild variant="outline" size="sm" className="w-full mt-4 justify-center gap-1.5 border-sky-700/20 text-sky-700 hover:bg-sky-50 dark:hover:bg-sky-950/20">
+                    <Link href="/account/addresses">
+                      Configure Addresses
+                    </Link>
+                  </Button>
                 </CardContent>
               </Card>
             </div>

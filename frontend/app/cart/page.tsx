@@ -2,6 +2,7 @@
 
 import React, { useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Trash2, Minus, Plus, ShoppingBag, ArrowLeft, ShieldCheck, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 
@@ -16,6 +17,7 @@ import { SiteFooter } from "@/components/site/site-footer"
 import { formatPrice } from "@/components/site/commerce-data"
 
 export default function CartPage() {
+  const router = useRouter()
   const { user, isLoading: isAuthLoading } = useCustomerAuth()
   const { cart, isLoading: isCartLoading, updateQuantity, removeItem } = useCart()
   const [busyItems, setBusyItems] = useState<Record<number, boolean>>({})
@@ -53,11 +55,7 @@ export default function CartPage() {
   }
 
   const handleCheckout = () => {
-    setCheckoutLoading(true)
-    setTimeout(() => {
-      setCheckoutLoading(false)
-      toast.info("Checkout is disabled for this mock store storefront demo.")
-    }, 1500)
+    router.push("/checkout")
   }
 
   const subtotal = cart?.subtotal ?? 0

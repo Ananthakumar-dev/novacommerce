@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Boxes, FolderTree, LayoutDashboard, Package, Store, Users, Tag } from "lucide-react"
+import { Boxes, FolderTree, LayoutDashboard, Package, Store, Users, Tag, Truck } from "lucide-react"
 
 import type { AdminProfile } from "@/lib/auth"
 import {
@@ -49,6 +49,11 @@ const navItems = [
     title: "Brands",
     href: "/admin/brands",
     icon: Tag,
+  },
+  {
+    title: "Shipping",
+    href: "/admin/shipping",
+    icon: Truck,
   },
 ]
 

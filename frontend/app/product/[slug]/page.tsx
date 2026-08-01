@@ -84,7 +84,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
     ...mockProduct,
     id: dbProduct?.id,
     price: dbProduct?.price ?? mockProduct.price,
-    salePrice: dbProduct?.salePrice ?? mockProduct.salePrice,
+    salePrice: dbProduct?.salePrice ?? dbProduct?.price ?? mockProduct.price,
     stockQuantity: dbProduct?.stockQuantity ?? 10,
   }
 
