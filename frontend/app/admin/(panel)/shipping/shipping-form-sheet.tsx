@@ -16,7 +16,8 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 import { Switch } from "@/components/ui/switch"
-import { createAdminShippingMethod, updateAdminShippingMethod, type AdminShippingMethod } from "@/lib/admin-shipping"
+import type { AdminShippingMethod } from "@/lib/admin-shipping"
+import { createShippingMethodAction, updateShippingMethodAction } from "./actions"
 
 type ShippingFormSheetProps = {
   isOpen: boolean
@@ -100,10 +101,10 @@ export function ShippingFormSheet({
       }
 
       if (editingMethod) {
-        await updateAdminShippingMethod(editingMethod.id, payload)
+        await updateShippingMethodAction(editingMethod.id, payload)
         toast.success("Shipping method updated successfully.")
       } else {
-        await createAdminShippingMethod(payload)
+        await createShippingMethodAction(payload)
         toast.success("Shipping method created successfully.")
       }
 

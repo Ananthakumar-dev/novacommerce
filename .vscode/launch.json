@@ -2,6 +2,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "OrderServiceApplication",
+      "request": "launch",
+      "mainClass": "com.novacommerce.order_service.OrderServiceApplication",
+      "projectName": "order-service"
+    },
+    {
+      "type": "java",
       "name": "ProductServiceApplication",
       "request": "launch",
       "mainClass": "com.novacommerce.product.ProductServiceApplication",

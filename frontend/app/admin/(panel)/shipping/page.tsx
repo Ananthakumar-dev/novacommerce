@@ -31,7 +31,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { listAdminShippingMethods, deleteAdminShippingMethod, type AdminShippingMethod } from "@/lib/admin-shipping"
+import type { AdminShippingMethod } from "@/lib/admin-shipping"
+import { listShippingMethodsAction, deleteShippingMethodAction } from "./actions"
 import { formatPrice } from "@/components/site/commerce-data"
 import { ShippingFormSheet } from "./shipping-form-sheet"
 
@@ -46,7 +47,7 @@ export default function ShippingAdminPage() {
   const fetchMethods = async () => {
     try {
       setIsLoading(true)
-      const data = await listAdminShippingMethods()
+      const data = await listShippingMethodsAction()
       setMethods(data)
     } catch (err) {
       console.error(err)
@@ -75,7 +76,7 @@ export default function ShippingAdminPage() {
 
     try {
       setIsDeleting(true)
-      await deleteAdminShippingMethod(deletingMethod.id)
+      await deleteShippingMethodAction(deletingMethod.id)
       toast.success(`Removed ${deletingMethod.name} shipping method.`)
       setDeletingMethod(null)
       fetchMethods()
