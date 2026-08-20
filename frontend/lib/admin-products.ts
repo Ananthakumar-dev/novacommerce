@@ -62,6 +62,7 @@ export async function listAdminProducts({
   page?: number;
   size?: number;
 } = {}) {
+  console.log("list admin products");
   const token = await requireAdminToken();
   if (!token) redirect("/admin");
   const params = new URLSearchParams({

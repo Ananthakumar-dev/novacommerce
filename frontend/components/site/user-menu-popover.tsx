@@ -2,7 +2,7 @@
 
 import React, { useState } from "react"
 import Link from "next/link"
-import { LogIn, UserPlus, User, ShoppingBag, LogOut, ShieldCheck, ChevronRight, LayoutDashboard } from "lucide-react"
+import { LogIn, UserPlus, User, ShoppingBag, LogOut, ShieldCheck, ChevronRight, LayoutDashboard, Package, Boxes } from "lucide-react"
 
 import { useCustomerAuth } from "@/components/providers/customer-auth-provider"
 import { Button } from "@/components/ui/button"
@@ -88,6 +88,34 @@ export function UserMenuPopover() {
                   </div>
                   <ChevronRight className="size-4 text-muted-foreground/60 group-hover:translate-x-0.5 transition-transform" />
                 </Link>
+              )}
+
+              {user.role === "MERCHANT" && (
+                <>
+                  <Link
+                    href="/dashboard/products"
+                    onClick={() => setOpen(false)}
+                    className="flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg hover:bg-accent text-foreground transition-colors group"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Package className="size-4 text-sky-600 dark:text-sky-400 group-hover:scale-110 transition-transform" />
+                      <span>Manage Products</span>
+                    </div>
+                    <ChevronRight className="size-4 text-muted-foreground/60 group-hover:translate-x-0.5 transition-transform" />
+                  </Link>
+
+                  <Link
+                    href="/dashboard/inventory"
+                    onClick={() => setOpen(false)}
+                    className="flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg hover:bg-accent text-foreground transition-colors group"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Boxes className="size-4 text-sky-600 dark:text-sky-400 group-hover:scale-110 transition-transform" />
+                      <span>Inventory Management</span>
+                    </div>
+                    <ChevronRight className="size-4 text-muted-foreground/60 group-hover:translate-x-0.5 transition-transform" />
+                  </Link>
+                </>
               )}
 
               <Link

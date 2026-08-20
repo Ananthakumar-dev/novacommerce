@@ -39,6 +39,7 @@ public class ProductService {
     private final BrandRepository brandRepository;
 
     public ProductPageResponse listProducts(int page, int size) {
+        System.out.println("list products");
         var safePage = Math.max(page, 0);
         var safeSize = Math.min(Math.max(size, 1), 50);
         var pageable = PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -65,14 +66,14 @@ public class ProductService {
     }
 
     public ProductPageResponse listStorefrontCatalog(String query,
-                                                     String category,
-                                                     String brand,
-                                                     BigDecimal minPrice,
-                                                     BigDecimal maxPrice,
-                                                     Boolean inStock,
-                                                     String sort,
-                                                     int page,
-                                                     int size) {
+            String category,
+            String brand,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
+            Boolean inStock,
+            String sort,
+            int page,
+            int size) {
         var safePage = Math.max(page, 0);
         var safeSize = Math.min(Math.max(size, 1), 48);
         var pageable = PageRequest.of(safePage, safeSize, resolveStorefrontSort(sort));
@@ -177,6 +178,98 @@ public class ProductService {
         productRepository.delete(product);
     }
 
+    public ProductPageResponse listMerchantProducts(Long merchantId, int page, int size) {
+        var safePage = Math.max(page, 0);
+        var safeSize = Math.min(Math.max(size, 1), 50);
+        var pageable = PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.DESC, "createdAt"));
+        var products = productRepository.findByMerchantId(merchantId, pageable);
+        return toPageResponse(products);
+    }
+
+    public ProductResponse getMerchantProduct(Long id, Long merchantId) {
+        var product = productRepository.findByIdAndMerchantId(id, merchantId)
+                .orElseThrow(() -> new ProductNotFoundException(id));
+        return ProductResponse.from(product);
+    }
+
+    public ProductResponse createMerchantProduct(Long merchantId, ProductRequest request) {
+        validateOptions(request);
+        var slug = resolveSlug(request.getSlug(), request.getName());
+        var sku = normalizeRequired(request.getSku());
+
+        if (productRepository.existsBySkuIgnoreCase(sku)) {
+            throw new DuplicateProductException("A product with this SKU already exists");
+        }
+
+        if (productRepository.existsBySlugIgnoreCase(slug)) {
+            throw new DuplicateProductException("A product with this slug already exists");
+        }
+
+        var product = Product.builder()
+                .name(normalizeRequired(request.getName()))
+                .slug(slug)
+                .description(normalizeOptional(request.getDescription()))
+                .shortDescription(normalizeOptional(request.getShortDescription()))
+                .sku(sku)
+                .price(request.getPrice())
+                .salePrice(request.getSalePrice())
+                .stockQuantity(request.getStockQuantity())
+                .lowStockThreshold(request.getLowStockThreshold() == null ? 0 : request.getLowStockThreshold())
+                .status(request.getStatus() == null ? ProductStatus.DRAFT : request.getStatus())
+                .category(normalizeRequired(request.getCategory()))
+                .brand(normalizeRequired(request.getBrand()))
+                .merchantId(merchantId)
+                .imageUrl(normalizeOptional(request.getImageUrl()))
+                .featured(false)
+                .popular(false)
+                .metaTitle(normalizeOptional(request.getMetaTitle()))
+                .metaDescription(normalizeOptional(request.getMetaDescription()))
+                .build();
+
+        return ProductResponse.from(productRepository.save(product));
+    }
+
+    public ProductResponse updateMerchantProduct(Long id, Long merchantId, ProductRequest request) {
+        var product = productRepository.findByIdAndMerchantId(id, merchantId)
+                .orElseThrow(() -> new ProductNotFoundException(id));
+        validateOptions(request);
+        var slug = resolveSlug(request.getSlug(), request.getName());
+        var sku = normalizeRequired(request.getSku());
+
+        if (productRepository.existsBySkuIgnoreCaseAndIdNot(sku, id)) {
+            throw new DuplicateProductException("A product with this SKU already exists");
+        }
+
+        if (productRepository.existsBySlugIgnoreCaseAndIdNot(slug, id)) {
+            throw new DuplicateProductException("A product with this slug already exists");
+        }
+
+        product.setName(normalizeRequired(request.getName()));
+        product.setSlug(slug);
+        product.setDescription(normalizeOptional(request.getDescription()));
+        product.setShortDescription(normalizeOptional(request.getShortDescription()));
+        product.setSku(sku);
+        product.setPrice(request.getPrice());
+        product.setSalePrice(request.getSalePrice());
+        product.setStockQuantity(request.getStockQuantity());
+        product.setLowStockThreshold(request.getLowStockThreshold() == null ? 0 : request.getLowStockThreshold());
+        product.setStatus(request.getStatus() == null ? ProductStatus.DRAFT : request.getStatus());
+        product.setCategory(normalizeRequired(request.getCategory()));
+        product.setBrand(normalizeRequired(request.getBrand()));
+        product.setMerchantId(merchantId);
+        product.setImageUrl(normalizeOptional(request.getImageUrl()));
+        product.setMetaTitle(normalizeOptional(request.getMetaTitle()));
+        product.setMetaDescription(normalizeOptional(request.getMetaDescription()));
+
+        return ProductResponse.from(productRepository.save(product));
+    }
+
+    public void deleteMerchantProduct(Long id, Long merchantId) {
+        var product = productRepository.findByIdAndMerchantId(id, merchantId)
+                .orElseThrow(() -> new ProductNotFoundException(id));
+        productRepository.delete(product);
+    }
+
     public ProductResponse updatePopular(Long id, ProductPopularRequest request) {
         var product = findProduct(id);
         product.setPopular(Boolean.TRUE.equals(request.getPopular()));
@@ -246,11 +339,11 @@ public class ProductService {
     }
 
     private Specification<Product> storefrontCatalogSpec(String query,
-                                                         String category,
-                                                         String brand,
-                                                         BigDecimal minPrice,
-                                                         BigDecimal maxPrice,
-                                                         Boolean inStock) {
+            String category,
+            String brand,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
+            Boolean inStock) {
         return (root, criteriaQuery, criteriaBuilder) -> {
             var predicates = new java.util.ArrayList<jakarta.persistence.criteria.Predicate>();
             predicates.add(criteriaBuilder.equal(root.get("status"), ProductStatus.ACTIVE));

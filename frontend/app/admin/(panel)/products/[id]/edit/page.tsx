@@ -8,7 +8,7 @@ import { listAdminMerchants } from "@/lib/admin-users"
 import { ProductForm } from "../../product-form"
 
 export const metadata: Metadata = {
-  title: "Edit Product | NovaCommerce Admin",
+  title: "Edit Product | NovaCommerce Admin.",
   description: "Edit a NovaCommerce product.",
 }
 

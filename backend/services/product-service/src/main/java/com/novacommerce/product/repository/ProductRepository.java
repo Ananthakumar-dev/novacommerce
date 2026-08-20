@@ -12,11 +12,18 @@ import com.novacommerce.product.entity.Product;
 import com.novacommerce.product.enums.ProductStatus;
 
 public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
+    // find by product slug name
     Optional<Product> findBySlug(String slug);
 
     List<Product> findByMerchantId(Long merchantId);
 
     Page<Product> findByMerchantId(Long merchantId, Pageable pageable);
+
+    Optional<Product> findByIdAndMerchantId(Long id, Long merchantId);
+
+    long countByMerchantId(Long merchantId);
+
+    long countByMerchantIdAndStatus(Long merchantId, ProductStatus status);
 
     List<Product> findByStatusOrderByCreatedAtDesc(ProductStatus status, Pageable pageable);
 
@@ -35,4 +42,5 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     boolean existsBySkuIgnoreCaseAndIdNot(String sku, Long id);
 
     boolean existsBySlugIgnoreCaseAndIdNot(String slug, Long id);
+
 }

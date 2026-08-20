@@ -41,6 +41,7 @@ public class AdminUserController {
 
     @GetMapping
     public List<UserProfileResponse> listUsers(@RequestParam(required = false) Role role) {
+        System.out.println("list users");
         if (role != null) {
             return authService.listUsersByRole(role);
         }
@@ -54,7 +55,7 @@ public class AdminUserController {
 
     @PutMapping("/{id}")
     public UserProfileResponse updateUser(@PathVariable Long id,
-                                          @Valid @RequestBody UpdateUserRequest request) {
+            @Valid @RequestBody UpdateUserRequest request) {
         return authService.updateUser(id, request);
     }
 

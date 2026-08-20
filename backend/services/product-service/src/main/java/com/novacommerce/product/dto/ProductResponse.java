@@ -35,6 +35,7 @@ public class ProductResponse {
     private LocalDateTime updatedAt;
 
     public static ProductResponse from(Product product) {
+        System.out.println("product");
         return ProductResponse.builder()
                 .id(product.getId())
                 .name(product.getName())

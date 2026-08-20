@@ -18,6 +18,7 @@ export type UserFormState = {
 }
 
 export async function listAdminUsers() {
+  console.log("list admin users");
   const token = await requireAdminToken()
   if(!token) redirect('/admin');
 

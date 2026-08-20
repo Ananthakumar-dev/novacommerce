@@ -59,7 +59,7 @@ export function ProductForm({
         <CardTitle>{isEditing ? "Edit product" : "Add product"}</CardTitle>
         <CardDescription>
           {isEditing
-            ? "Update catalog details, pricing, owner, and visibility."
+            ? "Update catalog details, pricing, owner, and visibility"
             : "Create a product for the NovaCommerce catalog."}
         </CardDescription>
       </CardHeader>

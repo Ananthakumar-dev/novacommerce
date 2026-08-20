@@ -42,6 +42,47 @@ public class InventoryService {
                 .toList();
     }
 
+    public List<InventoryItemResponse> listMerchantInventory(Long merchantId) {
+        return productRepository.findByMerchantId(merchantId)
+                .stream()
+                .map(InventoryItemResponse::from)
+                .toList();
+    }
+
+    public List<StockMovementResponse> listMerchantMovements(Long merchantId, Long productId) {
+        var movements = productId == null
+                ? stockMovementRepository.findByProductMerchantIdOrderByCreatedAtDesc(merchantId)
+                : stockMovementRepository.findByProductIdAndProductMerchantIdOrderByCreatedAtDesc(productId, merchantId);
+
+        return movements.stream()
+                .map(StockMovementResponse::from)
+                .toList();
+    }
+
+    @Transactional
+    public InventoryItemResponse adjustMerchantStock(Long merchantId, Long productId, StockAdjustmentRequest request) {
+        var product = productRepository.findByIdAndMerchantId(productId, merchantId)
+                .orElseThrow(() -> new ProductNotFoundException(productId));
+
+        var stockBefore = product.getStockQuantity();
+        var stockAfter = resolveStockAfter(stockBefore, request.getQuantity(), request.getType());
+
+        product.setStockQuantity(stockAfter);
+        var savedProduct = productRepository.save(product);
+
+        stockMovementRepository.save(StockMovement.builder()
+                .product(savedProduct)
+                .type(request.getType())
+                .quantity(request.getQuantity())
+                .stockBefore(stockBefore)
+                .stockAfter(stockAfter)
+                .reason(normalizeOptional(request.getReason()))
+                .reference(normalizeOptional(request.getReference()))
+                .build());
+
+        return InventoryItemResponse.from(savedProduct);
+    }
+
     @Transactional
     public InventoryItemResponse adjustStock(Long productId, StockAdjustmentRequest request) {
         var product = productRepository.findById(productId)

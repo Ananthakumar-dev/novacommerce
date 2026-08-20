@@ -30,14 +30,25 @@ public class JwtUtil {
     }
 
     public String generateToken(UserDetails userDetails, String role) {
-        return Jwts.builder()
+        return generateToken(userDetails, role, null);
+    }
+
+    public String generateToken(UserDetails userDetails, String role, Long userId) {
+        var builder = Jwts.builder()
                 .subject(userDetails.getUsername())
-                .claim("role", role)
+                .claim("role", role);
+
+        if (userId != null) {
+            builder.claim("userId", userId);
+        }
+
+        return builder
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey())
                 .compact();
     }
+
 
     public String extractEmail(String token) {
         return parseClaims(token).getSubject();

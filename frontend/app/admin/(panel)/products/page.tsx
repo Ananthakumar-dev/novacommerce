@@ -27,7 +27,7 @@ import { ProductActions } from "./product-actions"
 import { PopularToggle } from "./popular-toggle"
 
 export const metadata: Metadata = {
-  title: "Products | NovaCommerce Admin",
+  title: "Products | NovaCommerce Admin.",
   description: "Manage NovaCommerce products.",
 }
 

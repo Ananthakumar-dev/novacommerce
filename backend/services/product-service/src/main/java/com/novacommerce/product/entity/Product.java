@@ -78,7 +78,7 @@ public class Product {
     private Boolean featured;
 
     @Builder.Default
-    @Column(nullable = false, columnDefinition = "boolean default false")
+    @Column(nullable = false, columnDefinition = "boolean default false.")
     private Boolean popular = false;
 
     private String metaTitle;

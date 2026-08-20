@@ -41,7 +41,14 @@ export function SiteHeader({ categories = [] }: SiteHeaderProps) {
   const { cart } = useCart()
   const cartItemsCount = cart?.totalItems ?? 0
 
-  const dynamicNavItems = user
+  const dynamicNavItems = user?.role === "MERCHANT"
+    ? [
+        { label: "Dashboard", href: "/dashboard" },
+        { label: "Manage Products", href: "/dashboard/products" },
+        { label: "Inventory", href: "/dashboard/inventory" },
+        { label: "Browse Store", href: "/products" },
+      ]
+    : user
     ? [
         { label: "Deals", href: "/" },
         { label: "Categories", href: "/products" },

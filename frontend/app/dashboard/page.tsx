@@ -35,6 +35,7 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { SiteHeader } from "@/components/site/site-header"
 import { SiteFooter } from "@/components/site/site-footer"
+import { MerchantNav } from "@/components/merchant/merchant-nav"
 import {
   Table,
   TableBody,
@@ -123,6 +124,8 @@ export default function DashboardPage() {
       <SiteHeader />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 py-8 space-y-8">
+        {isMerchant && <MerchantNav />}
+
         {/* Welcome Section */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-border/60 shadow-sm animate-in fade-in slide-in-from-top-4 duration-500">
           <div className="flex items-center gap-4">
@@ -259,7 +262,7 @@ export default function DashboardPage() {
                     </div>
                   ))}
                   <Button variant="outline" size="sm" className="w-full mt-2" asChild>
-                    <Link href="/admin/inventory" className="gap-1 flex justify-center items-center">
+                    <Link href="/dashboard/inventory" className="gap-1 flex justify-center items-center">
                       Manage Inventory
                       <ArrowRight className="size-4" />
                     </Link>
@@ -275,15 +278,15 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent className="grid grid-cols-2 gap-2">
                   <Button variant="outline" className="flex flex-col items-center justify-center p-6 h-auto gap-2 text-center hover:bg-sky-500/5 hover:border-sky-500/20 transition-all" asChild>
-                    <Link href="/admin/products">
+                    <Link href="/dashboard/products">
                       <Store className="size-5 text-sky-700" />
-                      <span className="text-xs font-semibold">Catalog</span>
+                      <span className="text-xs font-semibold">Manage Products</span>
                     </Link>
                   </Button>
                   <Button variant="outline" className="flex flex-col items-center justify-center p-6 h-auto gap-2 text-center hover:bg-indigo-500/5 hover:border-indigo-500/20 transition-all" asChild>
-                    <Link href="/admin/categories">
+                    <Link href="/dashboard/inventory">
                       <Layers className="size-5 text-indigo-700" />
-                      <span className="text-xs font-semibold">Categories</span>
+                      <span className="text-xs font-semibold">Inventory</span>
                     </Link>
                   </Button>
                   <Button variant="outline" className="col-span-2 py-3 justify-between hover:bg-muted/50" asChild>

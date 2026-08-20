@@ -122,6 +122,7 @@ export async function getStorefrontProductBySlug(slug: string) {
 }
 
 async function storefrontFetch<T>(path: string, fallback: T) {
+  console.log("storefront fetch");
   try {
     const response = await fetch(`${getApiGatewayUrl()}${path}`, {
       cache: "no-store",

@@ -43,10 +43,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             var claims = jwtUtil.parseClaims(token);
             String email = claims.getSubject();
             String role = claims.get("role", String.class);
+            Object rawUserId = claims.get("userId");
+            Long userId = null;
+            if (rawUserId instanceof Number number) {
+                userId = number.longValue();
+            }
 
             if (email != null && role != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 var authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
-                var authToken = new UsernamePasswordAuthenticationToken(email, null, authorities);
+                var principal = new com.novacommerce.product.security.SecurityUser(userId, email, role);
+                var authToken = new UsernamePasswordAuthenticationToken(principal, null, authorities);
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }

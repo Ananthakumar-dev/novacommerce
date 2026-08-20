@@ -79,6 +79,7 @@ public class AuthService {
 
     @Transactional
     public UserProfileResponse updateUser(Long id, UpdateUserRequest request) {
+        System.out.println("update user");
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User was not found"));
 
@@ -138,7 +139,7 @@ public class AuthService {
     }
 
     private AuthResponse toAuthResponse(User user) {
-        String token = jwtUtil.generateToken(user, user.getRole().name());
+        String token = jwtUtil.generateToken(user, user.getRole().name(), user.getId());
         return new AuthResponse(token, user.getRole().name(), user.getEmail(), user.getFullName());
     }
 
