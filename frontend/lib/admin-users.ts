@@ -33,6 +33,23 @@ export async function listAdminUsers() {
   return (await response.json()) as AdminUser[]
 }
 
+export async function listAdminMerchants() {
+  const token = await requireAdminToken()
+  if(!token) redirect('/admin');
+
+  const response = await fetch(`${getApiGatewayUrl()}/api/auth/admin/users?role=MERCHANT`, {
+    headers: authHeaders(token),
+    cache: "no-store",
+  })
+
+  if (!response.ok) {
+    return []
+  }
+
+  const users = (await response.json()) as AdminUser[]
+  return users.filter((u) => u.role === "MERCHANT")
+}
+
 export async function getAdminUser(id: string) {
 const token = await requireAdminToken()
   if(!token) redirect('/admin');

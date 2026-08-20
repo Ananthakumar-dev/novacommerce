@@ -125,6 +125,7 @@ public class ProductService {
                 .status(request.getStatus() == null ? ProductStatus.DRAFT : request.getStatus())
                 .category(normalizeRequired(request.getCategory()))
                 .brand(normalizeRequired(request.getBrand()))
+                .merchantId(request.getMerchantId())
                 .imageUrl(normalizeOptional(request.getImageUrl()))
                 .featured(Boolean.TRUE.equals(request.getFeatured()))
                 .popular(Boolean.TRUE.equals(request.getPopular()))
@@ -161,6 +162,7 @@ public class ProductService {
         product.setStatus(request.getStatus() == null ? ProductStatus.DRAFT : request.getStatus());
         product.setCategory(normalizeRequired(request.getCategory()));
         product.setBrand(normalizeRequired(request.getBrand()));
+        product.setMerchantId(request.getMerchantId());
         product.setImageUrl(normalizeOptional(request.getImageUrl()));
         product.setFeatured(Boolean.TRUE.equals(request.getFeatured()));
         product.setPopular(Boolean.TRUE.equals(request.getPopular()));

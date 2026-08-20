@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 
 import { updateProductAction } from "@/app/admin/(panel)/products/actions"
 import { getAdminProduct, getProductOptions } from "@/lib/admin-products"
+import { listAdminMerchants } from "@/lib/admin-users"
 
 import { ProductForm } from "../../product-form"
 
@@ -19,9 +20,10 @@ type EditProductPageProps = {
 
 export default async function EditProductPage({ params }: EditProductPageProps) {
   const { id } = await params
-  const [product, options] = await Promise.all([
+  const [product, options, merchants] = await Promise.all([
     getAdminProduct(id),
     getProductOptions(),
+    listAdminMerchants(),
   ])
 
   if (!product) {
@@ -34,6 +36,7 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
         <ProductForm
           action={updateProductAction.bind(null, id)}
           options={options}
+          merchants={merchants}
           product={product}
         />
       </div>

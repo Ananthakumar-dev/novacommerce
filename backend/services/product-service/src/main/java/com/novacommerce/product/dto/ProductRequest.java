@@ -48,6 +48,8 @@ public class ProductRequest {
     @NotBlank(message = "Brand is required")
     private String brand;
 
+    private Long merchantId;
+
     private String imageUrl;
 
     private Boolean featured;

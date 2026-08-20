@@ -1,8 +1,9 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { ChevronLeft, ChevronRight, Package, Plus } from "lucide-react"
+import { ChevronLeft, ChevronRight, Package, Plus, ShieldCheck, Store } from "lucide-react"
 
 import { listAdminProducts, type ProductStatus } from "@/lib/admin-products"
+import { listAdminMerchants } from "@/lib/admin-users"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -41,12 +42,16 @@ const PAGE_SIZE = 10
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
   const { page } = await searchParams
   const currentPage = Math.max(Number(page ?? "1") || 1, 1)
-  const productsPage = await listAdminProducts({
-    page: currentPage - 1,
-    size: PAGE_SIZE,
-  })
+  const [productsPage, merchants] = await Promise.all([
+    listAdminProducts({
+      page: currentPage - 1,
+      size: PAGE_SIZE,
+    }),
+    listAdminMerchants(),
+  ])
   const products = productsPage.items
   const totalPages = productsPage.totalPages
+  const merchantMap = new Map(merchants.map((m) => [m.id, m]))
 
   return (
     <main className="flex-1 bg-background text-foreground">
@@ -55,7 +60,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
           <CardHeader>
             <CardTitle>Products</CardTitle>
             <CardDescription>
-              Manage catalog items, pricing, stock, and visibility.
+              Manage catalog items, pricing, stock, merchant ownership, and visibility.
             </CardDescription>
             <CardAction>
               <Button asChild>
@@ -73,6 +78,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                   <TableRow>
                     <TableHead>Product</TableHead>
                     <TableHead>SKU</TableHead>
+                    <TableHead>Owner</TableHead>
                     <TableHead>Category</TableHead>
                     <TableHead>Brand</TableHead>
                     <TableHead>Price</TableHead>
@@ -83,37 +89,69 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {products.map((product) => (
-                    <TableRow key={product.id}>
-                      <TableCell className="font-medium">
-                        <div className="min-w-44">
-                          <div>{product.name}</div>
-                          <div className="mt-1 text-xs text-muted-foreground">
-                            {product.slug}
+                  {products.map((product) => {
+                    const merchant = product.merchantId
+                      ? merchantMap.get(product.merchantId)
+                      : null
+
+                    return (
+                      <TableRow key={product.id}>
+                        <TableCell className="font-medium">
+                          <div className="min-w-44">
+                            <div>{product.name}</div>
+                            <div className="mt-1 text-xs text-muted-foreground">
+                              {product.slug}
+                            </div>
                           </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>{product.sku}</TableCell>
-                      <TableCell>{product.category}</TableCell>
-                      <TableCell>{product.brand}</TableCell>
-                      <TableCell>{formatCurrency(product.salePrice ?? product.price)}</TableCell>
-                      <TableCell>{product.stockQuantity}</TableCell>
-                      <TableCell>
-                        <PopularToggle
-                          id={product.id}
-                          popular={product.popular}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={statusVariant(product.status)}>
-                          {statusLabel(product.status)}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <ProductActions id={product.id} name={product.name} />
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                        </TableCell>
+                        <TableCell>{product.sku}</TableCell>
+                        <TableCell>
+                          {product.merchantId ? (
+                            <Badge
+                              variant="outline"
+                              className="border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300 font-normal"
+                            >
+                              <Store className="mr-1 size-3" aria-hidden="true" />
+                              {merchant
+                                ? merchant.fullName
+                                : `Merchant #${product.merchantId}`}
+                            </Badge>
+                          ) : (
+                            <Badge
+                              variant="secondary"
+                              className="font-normal text-muted-foreground"
+                            >
+                              <ShieldCheck
+                                className="mr-1 size-3 text-primary"
+                                aria-hidden="true"
+                              />
+                              Admin (Platform)
+                            </Badge>
+                          )}
+                        </TableCell>
+                        <TableCell>{product.category}</TableCell>
+                        <TableCell>{product.brand}</TableCell>
+                        <TableCell>
+                          {formatCurrency(product.salePrice ?? product.price)}
+                        </TableCell>
+                        <TableCell>{product.stockQuantity}</TableCell>
+                        <TableCell>
+                          <PopularToggle
+                            id={product.id}
+                            popular={product.popular}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={statusVariant(product.status)}>
+                            {statusLabel(product.status)}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <ProductActions id={product.id} name={product.name} />
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
                 </TableBody>
               </Table>
             ) : (

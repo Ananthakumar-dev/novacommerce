@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,6 +19,7 @@ import com.novacommerce.auth.dto.AuthResponse;
 import com.novacommerce.auth.dto.RegisterRequest;
 import com.novacommerce.auth.dto.UpdateUserRequest;
 import com.novacommerce.auth.dto.UserProfileResponse;
+import com.novacommerce.auth.enums.Role;
 import com.novacommerce.auth.service.AuthService;
 
 import jakarta.validation.Valid;
@@ -38,7 +40,10 @@ public class AdminUserController {
     }
 
     @GetMapping
-    public List<UserProfileResponse> listUsers() {
+    public List<UserProfileResponse> listUsers(@RequestParam(required = false) Role role) {
+        if (role != null) {
+            return authService.listUsersByRole(role);
+        }
         return authService.listUsers();
     }
 

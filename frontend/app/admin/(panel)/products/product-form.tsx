@@ -7,6 +7,7 @@ import { AlertCircle, ArrowLeft, Save } from "lucide-react"
 
 import type {
   AdminProduct,
+  MerchantOption,
   ProductFormState,
   ProductOptions,
 } from "@/lib/admin-products"
@@ -36,12 +37,18 @@ type ProductFormProps = {
     formData: FormData
   ) => Promise<ProductFormState>
   options: ProductOptions
+  merchants?: MerchantOption[]
   product?: AdminProduct
 }
 
 const initialState: ProductFormState = {}
 
-export function ProductForm({ action, options, product }: ProductFormProps) {
+export function ProductForm({
+  action,
+  options,
+  merchants = [],
+  product,
+}: ProductFormProps) {
   const [state, formAction] = useActionState(action, initialState)
   const isEditing = Boolean(product)
   const hasCategories = options.categories.length > 0
@@ -52,7 +59,7 @@ export function ProductForm({ action, options, product }: ProductFormProps) {
         <CardTitle>{isEditing ? "Edit product" : "Add product"}</CardTitle>
         <CardDescription>
           {isEditing
-            ? "Update catalog details, pricing, and visibility."
+            ? "Update catalog details, pricing, owner, and visibility."
             : "Create a product for the NovaCommerce catalog."}
         </CardDescription>
       </CardHeader>
@@ -104,7 +111,7 @@ export function ProductForm({ action, options, product }: ProductFormProps) {
             </Field>
           </div>
 
-          <div className="grid gap-5 sm:grid-cols-3">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             <Field label="SKU" htmlFor="sku">
               <Input
                 id="sku"
@@ -141,6 +148,28 @@ export function ProductForm({ action, options, product }: ProductFormProps) {
                   {options.brands.map((brand) => (
                     <SelectItem key={brand} value={brand}>
                       {brand}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field label="Product owner (Merchant)" htmlFor="merchantId">
+              <Select
+                name="merchantId"
+                defaultValue={
+                  product?.merchantId ? String(product.merchantId) : "admin"
+                }
+              >
+                <SelectTrigger id="merchantId" className="w-full">
+                  <SelectValue placeholder="Select owner" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="admin">
+                    Admin / Site Product (Platform)
+                  </SelectItem>
+                  {merchants.map((merchant) => (
+                    <SelectItem key={merchant.id} value={String(merchant.id)}>
+                      {merchant.fullName} ({merchant.email})
                     </SelectItem>
                   ))}
                 </SelectContent>

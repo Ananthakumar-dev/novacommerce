@@ -69,6 +69,9 @@ public class Product {
     @Column(nullable = false)
     private String brand;
 
+    @Column(name = "merchant_id")
+    private Long merchantId;
+
     private String imageUrl;
 
     @Column(nullable = false)

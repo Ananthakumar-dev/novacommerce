@@ -64,6 +64,13 @@ public class AuthService {
                 .toList();
     }
 
+    public List<UserProfileResponse> listUsersByRole(Role role) {
+        return userRepository.findByRole(role)
+                .stream()
+                .map(this::toProfileResponse)
+                .toList();
+    }
+
     public UserProfileResponse getUser(Long id) {
         return userRepository.findById(id)
                 .map(this::toProfileResponse)

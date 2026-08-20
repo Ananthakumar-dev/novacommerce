@@ -25,6 +25,7 @@ public class ProductResponse {
     private ProductStatus status;
     private String category;
     private String brand;
+    private Long merchantId;
     private String imageUrl;
     private Boolean featured;
     private Boolean popular;
@@ -48,6 +49,7 @@ public class ProductResponse {
                 .status(product.getStatus())
                 .category(product.getCategory())
                 .brand(product.getBrand())
+                .merchantId(product.getMerchantId())
                 .imageUrl(product.getImageUrl())
                 .featured(product.getFeatured())
                 .popular(product.getPopular())

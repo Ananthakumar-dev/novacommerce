@@ -21,6 +21,7 @@ export type AdminProduct = {
   status: ProductStatus;
   category: string;
   brand: string;
+  merchantId: number | null;
   imageUrl: string | null;
   featured: boolean;
   popular: boolean;
@@ -28,6 +29,12 @@ export type AdminProduct = {
   metaDescription: string | null;
   createdAt: string;
   updatedAt: string;
+};
+
+export type MerchantOption = {
+  id: number;
+  fullName: string;
+  email: string;
 };
 
 export type ProductOptions = {
@@ -220,6 +227,11 @@ export async function updateAdminProductPopular(id: string, popular: boolean) {
 
 async function productPayload(formData: FormData) {
   const uploadedImageUrl = await uploadAdminImage(formData.get("imageFile"));
+  const rawMerchantId = textValue(formData, "merchantId");
+  const merchantId =
+    rawMerchantId && rawMerchantId !== "admin" && rawMerchantId !== "0"
+      ? Number.parseInt(rawMerchantId, 10)
+      : null;
 
   return {
     name: textValue(formData, "name"),
@@ -234,6 +246,7 @@ async function productPayload(formData: FormData) {
     status: textValue(formData, "status") as ProductStatus,
     category: textValue(formData, "category"),
     brand: textValue(formData, "brand"),
+    merchantId,
     imageUrl: uploadedImageUrl ?? textValue(formData, "imageUrl"),
     featured: formData.get("featured") === "on",
     popular: formData.get("popular") === "on",

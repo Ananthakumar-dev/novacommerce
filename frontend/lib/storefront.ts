@@ -26,6 +26,7 @@ export type StorefrontProduct = {
   status: "DRAFT" | "ACTIVE" | "INACTIVE"
   category: string
   brand: string
+  merchantId?: number | null
   imageUrl: string | null
   featured: boolean
   popular: boolean
